@@ -1,26 +1,20 @@
 import disnake
 from disnake.ext import commands
-import Utils
-from Utils import *
-import NationCommand
-from NationCommand import NationCommand
-import ResCommand
-from ResCommand import ResCommand
-import TownCommand
-from TownCommand import TownCommand
 import AllianceCommand
-from AllianceCommand import AllianceCommand
-import ServerCommand
-from ServerCommand import ServerCommand
-import VotingSystem
-from VotingSystem import VoteCommand
-import weather
-from weather import WeatherCommand
 import LevelingSystem
+import NationCommand
+import ResCommand
+import ServerCommand
+import TownCommand
+from AllianceCommand import AllianceCommand
 from LevelingSystem import LevelingSystem
+from NationCommand import NationCommand
+from ResCommand import ResCommand
+from ServerCommand import ServerCommand
+from TownCommand import TownCommand
+from VotingSystem import VoteCommand
+from weather import WeatherCommand
 
-import disnake
-from disnake.ext import commands
 
 class HelpCog(commands.Cog):
     def __init__(self, bot):
