@@ -26,7 +26,7 @@ bot.load_extension("Utils.VotingSystem")
 bot.load_extension("Utils.weather")
 bot.load_extension("Utils.AllianceCommand")
 
-token = "MTEyMTc1MTQwMDI5NzI3OTU0OQ.GqDiar.YMpGg0xo4uxC786Y-xHY7pUKr5UfvB35ax4Rl0 "
+token = " "
 if token:
     bot.run(token)
 else:
