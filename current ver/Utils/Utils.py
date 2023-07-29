@@ -91,8 +91,8 @@ class Lookup:
 class Embeds():
 
      @staticmethod
-     def embed_builder(title, description=None, author=None, footer=None, thumbnail=None, maintain_bot=False,
-                        your_name=None):
+     def embed_builder(title, description=None, author=None, footer=None, thumbnail=None, maintain_bot=True,
+                        your_name="Charis_K"):
         embed = disnake.Embed(
             title=title,
             description=description,
@@ -102,7 +102,7 @@ class Embeds():
 
         if author is not None:
             if maintain_bot:
-                bot_name = "YourBotName"  # Replace this with your actual bot name
+                bot_name = "Jeff_"  # Replace this with your actual bot name
                 embed.set_author(
                     name=f"Queried by {author.display_name} - Maintained by {bot_name}",
                     icon_url=author.avatar.url if author.avatar else None
