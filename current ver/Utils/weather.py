@@ -3,7 +3,7 @@ from disnake.ext import commands
 import requests
 import Utils as Utils
 from Utils import *
-class Weather(commands.Cog):
+class WeatherCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -48,5 +48,5 @@ class Weather(commands.Cog):
             await inter.response.send_message("Sorry, couldn't fetch weather information for that location.")
 
 def setup(bot):
-    bot.add_cog(Weather(bot))
+    bot.add_cog(WeatherCommand(bot))
 
