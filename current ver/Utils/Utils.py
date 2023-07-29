@@ -91,7 +91,7 @@ class Lookup:
 class Embeds():
 
      @staticmethod
-     def embed_builder(title, description=None, author=None, footer=None, thumbnail=None, maintain_bot=True,
+     def embed_builder(title, description=None, author=None, footer=None, thumbnail=None, maintain_bot=False,
                         your_name="Charis_K"):
         embed = disnake.Embed(
             title=title,
