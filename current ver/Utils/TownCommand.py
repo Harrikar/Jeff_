@@ -262,6 +262,85 @@ class TownCommand(commands.Cog):
             )
             await inter.response.send_message(embed=embed, ephemeral=True)
 
+        @town.sub_command(
+            description="Retrieve and display all the residents of a specified nation with their last login time.")
+        async def activity(
+                self,
+                inter: disnake.ApplicationCommandInteraction,
+                nation: str,
+                server: str = "aurora"
+        ):
+            """Retrieve and display all the residents of a specified nation with their last login time."""
+            commandString = f"/nation activity nation: {nation} server: {server}"
+
+            await inter.response.defer()
+
+            try:
+                nationsLookup = Utils.Lookup.lookup(server, endpoint="towns", name=town)
+
+                embed = Utils.Embeds.embed_builder(
+                    title=f"`{nationsLookup['strings']['nation']}'s Residents and Last Login Time`",
+                    footer=commandString,
+                    author=inter.author
+                )
+
+                residents_list = [f"{resident['name']} - Last Login: <t:{int(resident['lastLogin'] / 1000)}:R>"
+                                  for resident in nationsLookup["residents"]]
+                residents_string = Utils.CommandTools.list_to_string(list=residents_list)
+
+                embed.add_field(name="Residents and Last Login Time", value=f"```{residents_string[:1018]}```",
+                                inline=True)
+
+                await inter.send(embed=embed, ephemeral=False)
+
+            except Exception as e:
+                embed = Utils.Embeds.error_embed(
+                    value="If it is not evident that the error was your fault, please report it",
+                    footer=commandString
+                )
+
+                await inter.send(embed=embed, ephemeral=True)
+
+        @town.sub_command(description="Retrieve and display the list of nations that match the specified keywords.")
+        async def list(
+                self,
+                inter: disnake.ApplicationCommandInteraction,
+                keyword: str = "chunks",
+                server: str = "aurora"
+        ):
+            """Retrieve and display the list of nations based on keywords 'chunks' or 'balance' or defaults to 'chunks'."""
+            commandString = f"/nation list keyword: {keyword} server: {server}"
+
+            await inter.response.defer()
+
+            try:
+                if keyword.lower() == "balance":
+                    townLookup = Utils.Lookup.lookup(server, endpoint="towns", sort="balance")
+                elif keyword.lower() == "residents":
+                    townLookup = Utils.Lookup.lookup(server, endpoint="towns", sort="residents")
+                else:
+                    townLookup = Utils.Lookup.lookup(server, endpoint="towns", sort="chunks")
+
+                nation_town = [town["name"] for town in townsLookup["allTowns"]]
+                town_list = Utils.CommandTools.list_to_string(list=nation_town)
+
+                embed = Utils.Embeds.embed_builder(
+                    title=f"Nations Sorted by {keyword.capitalize()}",
+                    description=f"```{town_list}```",
+                    footer=commandString,
+                    author=inter.author
+                )
+
+                await inter.send(embed=embed, ephemeral=False)
+
+            except Exception as e:
+                embed = Utils.Embeds.error_embed(
+                    footer=commandString
+                )
+
+                await inter.send(embed=embed, ephemeral=True)
+
+
 def setup(bot):
     bot.add_cog(TownCommand(bot))
 
