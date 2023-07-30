@@ -335,6 +335,7 @@ class TownCommand(commands.Cog):
 
             except Exception as e:
                 embed = Utils.Embeds.error_embed(
+                    value="If it is not evident that the error was your fault, please report it",
                     footer=commandString
                 )
 
