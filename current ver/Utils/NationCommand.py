@@ -334,7 +334,7 @@ class NationCommand(commands.Cog):
                 keyword: str = "chunks",
                 server: str = "aurora"
         ):
-            """Retrieve and display the list of nations based on keywords 'chunks' or 'balance' or defaults to 'chunks'."""
+
             commandString = f"/nation list keyword: {keyword} server: {server}"
 
             await inter.response.defer()
