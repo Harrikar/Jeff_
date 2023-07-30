@@ -71,7 +71,7 @@ class TownCommand(commands.Cog):
 
             embed.add_field(name="Residents", value=townsLookup["stats"]["numResidents"], inline=True)
             embed.add_field(
-                name="Town Blocks",
+                name="Chunks",
                 value=f"{townsLookup['stats']['numTownBlocks']}/{townsLookup['stats']['maxTownBlocks']} ({townsLookup['stats']['numTownBlocks'] * 16 + 48}G)",
                 inline=True
             )
