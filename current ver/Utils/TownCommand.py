@@ -348,12 +348,8 @@ class TownCommand(commands.Cog):
         # Define a global variable to store the cached towns data
         towns_cache = TTLCache(maxsize=100, ttl=60)
 
-        @bot.command(description="Check for missing towns from the EarthMC API")
+        @town.sub_command(description="Check for missing towns from the EarthMC API")
         async def missing(ctx, server: str = "aurora"):
-            global towns_cache
-
-            commandString = f"!missing server: {server}"
-
             try:
                 # Fetch the towns from the API or use the cached data if available
                 if (server, "towns") in towns_cache:
@@ -400,51 +396,53 @@ class TownCommand(commands.Cog):
             except Exception as e:
                 await ctx.send("An error occurred while fetching town data.")
 
-    def calculate_distance(self, x1, z1, x2, z2):
-        return ((x1 - x2) ** 2 + (z1 - z2) ** 2) ** 0.5
+        # Function to calculate distance between two coordinates
+        def calculate_distance(x1, z1, x2, z2):
+            return ((x2 - x1) ** 2 + (z2 - z1) ** 2) ** 0.5
 
-    async def fetch_town_data(self, server):
-        try:
+        # Function to fetch all town data from the API
+        async def fetch_town_data(server):
             all_towns_lookup = await Utils.Lookup.lookup(server, endpoint="towns")
             return all_towns_lookup["allTowns"]
-        except Exception as e:
-            print("Error fetching town data:", e)
-            return []
 
-    async def filter_towns_by_location(self, player_x, player_z, nation_name, server):
-        towns = await self.fetch_town_data(server)
-        nearby_towns = []
+        # Function to filter towns based on player's location and nation
+        async def filter_towns_by_location(player_x, player_z, nation_name, server):
+            towns = await fetch_town_data(server)
+            nearby_towns = []
 
-        for town in towns:
-            town_x = town["spawn"]["x"]
-            town_z = town["spawn"]["z"]
-            distance = self.calculate_distance(player_x, player_z, town_x, town_z)
-            if distance < 1000 and town["affiliation"]["nation"] == nation_name:
-                nearby_towns.append(town)
+            for town in towns:
+                town_x = town["spawn"]["x"]
+                town_z = town["spawn"]["z"]
+                distance = calculate_distance(player_x, player_z, town_x, town_z)
+                if distance < 1000 and town["affiliation"]["nation"] == nation_name:
+                    nearby_towns.append(town)
 
-        return nearby_towns
+            return nearby_towns
 
-    @bot.event()
-    async def check_near_town_spawn(self, ctx, player_name: str, nation_name: str, server: str = "aurora"):
-        try:
-            # Fetch player data from the API
-            player_data = await Utils.Lookup.lookup(server, endpoint="players", name=player_name)
+        @town.sub_command(
+            description="Check if a player is near the spawn of a town in the specified nation (Jefferson)")
+        async def check_near_town_spawn(ctx, player_name: str, server: str = "aurora"):
+            nation_name = "Jefferson"
 
-            # Get player's coordinates
-            player_x = player_data["x"]
-            player_z = player_data["z"]
+            try:
+                # Fetch player data from the API
+                player_data = await Utils.Lookup.lookup(server, endpoint="players", name=player_name)
 
-            # Filter towns based on player's location and nation
-            nearby_towns = await self.filter_towns_by_location(player_x, player_z, nation_name, server)
+                # Get player's coordinates
+                player_x = player_data["x"]
+                player_z = player_data["z"]
 
-            if nearby_towns:
-                town_names = ", ".join(town["name"] for town in nearby_towns)
-                await ctx.send(f"{player_name} is near the spawn of these towns of {nation_name}: {town_names}")
-            else:
-                await ctx.send(f"{player_name} is not near any town spawn of {nation_name}")
+                # Filter towns based on player's location and nation
+                nearby_towns = await filter_towns_by_location(player_x, player_z, nation_name, server)
 
-        except Exception as e:
-            await ctx.send("An error occurred while fetching player data or town data.")
+                if nearby_towns:
+                    town_names = ", ".join(town["name"] for town in nearby_towns)
+                    await ctx.send(f"{player_name} is near the spawn of these towns of {nation_name}: {town_names}")
+                else:
+                    await ctx.send(f"{player_name} is not near any town spawn of {nation_name}")
+
+            except Exception as e:
+                await ctx.send("An error occurred while fetching player data or town data.")
 
 
 def setup(bot):
