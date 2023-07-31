@@ -1,8 +1,12 @@
 import disnake
 from disnake.ext import commands
+from disnake.ext.commands import InteractionBot
 import Utils as Utils
 from Utils import *
 import random
+
+bot: InteractionBot = commands.InteractionBot()
+players_cache = {}
 
 class ResCommand(commands.Cog):
     def __init__(self, bot):
@@ -190,6 +194,36 @@ class ResCommand(commands.Cog):
             )
 
             await inter.send(embed=embed, ephemeral=True)
+
+    @bot.command(description="Track the coordinates of a player")
+    async def track(ctx, player_name: str, server: str = "aurora"):
+        global players_cache
+
+        commandString = f"!track player: {player_name} server: {server}"
+
+        try:
+            # Fetch player data from the API or use the cached data if available
+            if (server, "players", player_name) in players_cache:
+                player_lookup = players_cache[(server, "players", player_name)]
+            else:
+                player_lookup = await Utils.Lookup.lookup(server, endpoint="players", name=player_name)
+                players_cache[(server, "players", player_name)] = player_lookup
+
+            # Extract the player coordinates from the API response
+            x_coord = int(round(player_lookup["x"], 0))
+            z_coord = int(round(player_lookup["z"], 0))
+            location_url = f"https://earthmc.net/map/{server}/?zoom=4&x={x_coord}&z={z_coord}"
+            location = f"[{x_coord}, {z_coord}]({location_url})"
+
+            await ctx.send(f"{player_name}'s current location: {location}")
+
+        except Exception as e:
+            await ctx.send("An error occurred while fetching player data.")
+
+
+
+
+
     
 
 def setup(bot):

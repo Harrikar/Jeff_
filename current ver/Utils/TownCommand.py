@@ -400,6 +400,52 @@ class TownCommand(commands.Cog):
             except Exception as e:
                 await ctx.send("An error occurred while fetching town data.")
 
+    def calculate_distance(self, x1, z1, x2, z2):
+        return ((x1 - x2) ** 2 + (z1 - z2) ** 2) ** 0.5
+
+    async def fetch_town_data(self, server):
+        try:
+            all_towns_lookup = await Utils.Lookup.lookup(server, endpoint="towns")
+            return all_towns_lookup["allTowns"]
+        except Exception as e:
+            print("Error fetching town data:", e)
+            return []
+
+    async def filter_towns_by_location(self, player_x, player_z, nation_name, server):
+        towns = await self.fetch_town_data(server)
+        nearby_towns = []
+
+        for town in towns:
+            town_x = town["spawn"]["x"]
+            town_z = town["spawn"]["z"]
+            distance = self.calculate_distance(player_x, player_z, town_x, town_z)
+            if distance < 1000 and town["affiliation"]["nation"] == nation_name:
+                nearby_towns.append(town)
+
+        return nearby_towns
+
+    @bot.event()
+    async def check_near_town_spawn(self, ctx, player_name: str, nation_name: str, server: str = "aurora"):
+        try:
+            # Fetch player data from the API
+            player_data = await Utils.Lookup.lookup(server, endpoint="players", name=player_name)
+
+            # Get player's coordinates
+            player_x = player_data["x"]
+            player_z = player_data["z"]
+
+            # Filter towns based on player's location and nation
+            nearby_towns = await self.filter_towns_by_location(player_x, player_z, nation_name, server)
+
+            if nearby_towns:
+                town_names = ", ".join(town["name"] for town in nearby_towns)
+                await ctx.send(f"{player_name} is near the spawn of these towns of {nation_name}: {town_names}")
+            else:
+                await ctx.send(f"{player_name} is not near any town spawn of {nation_name}")
+
+        except Exception as e:
+            await ctx.send("An error occurred while fetching player data or town data.")
+
 
 def setup(bot):
     bot.add_cog(TownCommand(bot))

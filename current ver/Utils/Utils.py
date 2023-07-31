@@ -63,6 +63,7 @@ class CommandTools:
 
 class Lookup:
     server_lookup_cache = TTLCache(maxsize=100, ttl=60)
+    player_lookup_cache = TTLCache(maxsize=100, ttl=60)
 
     @classmethod
     async def lookup(cls, server, endpoint=None, name=None):
@@ -85,6 +86,24 @@ class Lookup:
         cls.server_lookup_cache[(server, endpoint, name)] = lookup
 
         return lookup
+
+    @classmethod
+    async def player_lookup(cls, username):
+        # Check if the data is already cached
+        if username in cls.player_lookup_cache:
+            return cls.player_lookup_cache[username]
+
+        api_url = f"https://api.earthmc.net/v1/players/{username}"
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(api_url) as response:
+                player_data = await response.json()
+
+        # Cache the data to avoid future API calls for the same player
+        cls.player_lookup_cache[username] = player_data
+
+        return player_data
+
 
 
 
