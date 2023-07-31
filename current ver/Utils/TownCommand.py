@@ -1,8 +1,10 @@
 import random
 import disnake
 from disnake.ext import commands
-import Utils as Utils
+from disnake.ext.commands import InteractionBot
 
+import Utils as Utils
+bot: InteractionBot = commands.InteractionBot()
 class TownCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -340,6 +342,33 @@ class TownCommand(commands.Cog):
                 )
 
                 await inter.send(embed=embed, ephemeral=True)
+
+
+        @bot.command(description="Check for missing towns from the EarthMC API")
+        async def missing(ctx, server: str = "aurora"):
+            global previous_towns
+
+            commandString = f"!missing server: {server}"
+
+            try:
+                # Fetch the towns from the API
+                all_towns_lookup = await Utils.Lookup.lookup(server, endpoint="towns")
+                api_towns = set(town["name"] for town in all_towns_lookup["allTowns"])
+
+                # Find missing towns
+                missing_towns = previous_towns - api_towns
+
+                if not missing_towns:
+                    await ctx.send("All towns are up to date.")
+                else:
+                    missing_towns_str = ", ".join(missing_towns)
+                    await ctx.send(f"The following towns are missing: {missing_towns_str}")
+
+                # Update the previous_towns list with the current towns from the API
+                previous_towns = api_towns
+
+            except Exception as e:
+                await ctx.send("An error occurred while fetching town data.")
 
 
 def setup(bot):
