@@ -376,8 +376,23 @@ class TownCommand(commands.Cog):
                 if not missing_towns:
                     await ctx.send("All towns are up to date.")
                 else:
-                    missing_towns_str = ", ".join(missing_towns)
-                    await ctx.send(f"The following towns are missing: {missing_towns_str}")
+                    # Fetch the missing town data from the API and add it to missing_towns_data list
+                    missing_towns_data = []  # Initialize the list to store missing town data
+
+                    for town in all_towns_lookup["allTowns"]:
+                        if town["name"] in missing_towns:
+                            x_coord = int(round(town["spawn"]["x"], 0))
+                            z_coord = int(round(town["spawn"]["z"], 0))
+                            location_url = f"https://earthmc.net/map/{server}/?zoom=4&x={x_coord}&z={z_coord}"
+                            location = f"[{x_coord}, {z_coord}]({location_url})"
+                            missing_towns_data.append(f"{town['name']} - Location: {location}")
+
+                    # If you have other missing town data to add to the list, you can do it here
+                    # For example:
+                    # missing_towns_data.append("Some other missing town data")
+
+                    missing_towns_str = "\n".join(missing_towns_data)
+                    await ctx.send(f"The following towns are missing:\n{missing_towns_str}")
 
                 # Update the cache with the current towns data
                 towns_cache[(server, "missing_towns")] = api_towns
@@ -388,4 +403,3 @@ class TownCommand(commands.Cog):
 
 def setup(bot):
     bot.add_cog(TownCommand(bot))
-
