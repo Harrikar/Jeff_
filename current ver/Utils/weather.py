@@ -3,11 +3,14 @@ from disnake.ext import commands
 import requests
 import Utils as Utils
 from Utils import *
-class Weather(commands.Cog):
+class WeatherCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.slash_command(name="weather", help="Get the current weather for a location.",description="Get the current weather for a location")
+
+    API_KEY = "7ef56e400a62114e2f5ec8ccd15b1ddb"
+
+    @commands.slash_command(name="weather", help="Get the current weather for a location.", description="Get the current weather for a location")
     async def weather(self, inter: disnake.ApplicationCommandInteraction, location: str, unit: str = "metric"):
         valid_units = ["metric", "imperial"]
         unit = unit.lower()
@@ -16,18 +19,17 @@ class Weather(commands.Cog):
             await inter.response.send_message("Invalid unit system. Please use 'metric' or 'imperial'.")
             return
 
-        api_key = "7ef56e400a62114e2f5ec8ccd15b1ddb"  # Replace this with your OpenWeatherMap API key
-        base_url = "http://api.openweathermap.org/data/2.5/weather?"
+        base_url = "http://api.openweathermap.org/data/2.5/weather"
 
         params = {
             "q": location,
-            "appid": api_key,
+            "appid": API_KEY,
             "units": unit,
         }
 
-        response = requests.get(base_url, params=params)
-
-        if response.status_code == 200:
+        try:
+            response = requests.get(base_url, params=params)
+            response.raise_for_status()  # Raise an exception if the status code is not 200
             data = response.json()
 
             weather_description = data["weather"][0]["description"]
@@ -44,9 +46,15 @@ class Weather(commands.Cog):
             weather_embed.add_field(name="Wind Speed", value=f"{wind_speed} m/s", inline=True)
 
             await inter.response.send_message(embed=weather_embed)
-        else:
+
+        except requests.exceptions.RequestException as e:
+            await inter.response.send_message(f"Error: {e}")
+        except KeyError:
             await inter.response.send_message("Sorry, couldn't fetch weather information for that location.")
+        except Exception as e:
+            await inter.response.send_message(f"An error occurred: {e}")
+
 
 def setup(bot):
-    bot.add_cog(Weather(bot))
+    bot.add_cog(WeatherCommand(bot))
 

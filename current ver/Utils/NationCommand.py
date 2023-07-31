@@ -51,7 +51,7 @@ class NationCommand(commands.Cog):
             embed.add_field(name="Residents", value=nationsLookup["stats"]["numResidents"], inline=True)
             embed.add_field(name="Towns", value=nationsLookup["stats"]["numTowns"], inline=True)
             embed.add_field(
-                name="Town Blocks",
+                name="Chunks",
                 value=f"{nationsLookup['stats']['numTownBlocks']} ({nationsLookup['stats']['numTownBlocks'] * 16 + (48 * nationsLookup['stats']['numTowns'])}G)",
                 inline=True
             )
@@ -334,7 +334,7 @@ class NationCommand(commands.Cog):
                 keyword: str = "chunks",
                 server: str = "aurora"
         ):
-            """Retrieve and display the list of nations based on keywords 'chunks' or 'balance' or defaults to 'chunks'."""
+
             commandString = f"/nation list keyword: {keyword} server: {server}"
 
             await inter.response.defer()

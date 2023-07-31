@@ -1,7 +1,14 @@
 import disnake
 from disnake.ext import commands
-import Utils
-from Utils import *
+from AllianceCommand import AllianceCommand
+from LevelingSystem import LevelingSystem
+from NationCommand import NationCommand
+from ResCommand import ResCommand
+from ServerCommand import ServerCommand
+from TownCommand import TownCommand
+from VotingSystem import VoteCommand
+from weather import WeatherCommand
+
 
 class HelpCog(commands.Cog):
     def __init__(self, bot):
@@ -18,5 +25,15 @@ class HelpCog(commands.Cog):
         embed = self.get_commands_embed()
         await ctx.send(embed=embed)
 
+
+def register_commands(bot):
+    # Register commands from custom command classes
+    cogs = [AllianceCommand(), LevelingSystem(), NationCommand(), ResCommand(),
+            ServerCommand(), TownCommand(), VoteCommand(), WeatherCommand(), HelpCog(bot)]
+
+    for cog in cogs:
+        bot.add_cog(cog)
+
+
 def setup(bot):
-    bot.add_cog(HelpCog(bot))
+    register_commands(bot)

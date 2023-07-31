@@ -1,9 +1,8 @@
 import disnake
 from disnake.ext import commands
 import Utils as Utils
-import Utils as Utils
 from Utils import *
-class Vote(commands.Cog):
+class VoteCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -96,4 +95,4 @@ class Vote(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Vote(bot))
+    bot.add_cog(VoteCommand(bot))
