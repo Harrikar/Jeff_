@@ -2,6 +2,8 @@ import random
 import disnake
 from disnake.ext import commands
 from disnake.ext.commands import InteractionBot
+import cachetools
+from cachetools import TTLCache
 
 import Utils as Utils
 bot: InteractionBot = commands.InteractionBot()
@@ -343,20 +345,33 @@ class TownCommand(commands.Cog):
 
                 await inter.send(embed=embed, ephemeral=True)
 
+        # Define a global variable to store the cached towns data
+        towns_cache = TTLCache(maxsize=100, ttl=60)
 
         @bot.command(description="Check for missing towns from the EarthMC API")
         async def missing(ctx, server: str = "aurora"):
-            global previous_towns
+            global towns_cache
 
             commandString = f"!missing server: {server}"
 
             try:
-                # Fetch the towns from the API
-                all_towns_lookup = await Utils.Lookup.lookup(server, endpoint="towns")
+                # Fetch the towns from the API or use the cached data if available
+                if (server, "towns") in towns_cache:
+                    all_towns_lookup = towns_cache[(server, "towns")]
+                else:
+                    all_towns_lookup = await Utils.Lookup.lookup(server, endpoint="towns")
+                    towns_cache[(server, "towns")] = all_towns_lookup
+
+                # Extract the town names from the API response
                 api_towns = set(town["name"] for town in all_towns_lookup["allTowns"])
 
-                # Find missing towns
-                missing_towns = previous_towns - api_towns
+                # Compare with the previous data (if available)
+                if (server, "missing_towns") in towns_cache:
+                    previous_towns = towns_cache[(server, "missing_towns")]
+                    missing_towns = previous_towns - api_towns
+                else:
+                    # If no previous data is available, consider all towns as missing
+                    missing_towns = api_towns
 
                 if not missing_towns:
                     await ctx.send("All towns are up to date.")
@@ -364,8 +379,8 @@ class TownCommand(commands.Cog):
                     missing_towns_str = ", ".join(missing_towns)
                     await ctx.send(f"The following towns are missing: {missing_towns_str}")
 
-                # Update the previous_towns list with the current towns from the API
-                previous_towns = api_towns
+                # Update the cache with the current towns data
+                towns_cache[(server, "missing_towns")] = api_towns
 
             except Exception as e:
                 await ctx.send("An error occurred while fetching town data.")
