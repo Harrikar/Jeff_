@@ -1,6 +1,6 @@
 import disnake
 from disnake.ext import commands
-import Utils as Utils
+import Utils
 
 class ServerCommand(commands.Cog):
     def __init__(self, bot):

@@ -1,10 +1,14 @@
 import random
 import disnake
 from disnake.ext import commands
-import Utils as Utils
+import Utils
 from Utils import *
-from disnake.errors import InteractionTimedOut
+import EarthMC
+from EarthMC import Maps
 
+Aurora = Maps.Aurora()
+Nova = Maps.Nova()
+aurora = Aurora.players
 class NationCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -26,12 +30,21 @@ class NationCommand(commands.Cog):
         await inter.response.defer()
 
         try:
+            maps = Utils.Aurora
+            if server == "Aurora":
+                maps = Utils.Aurora
+            elif server == "Nova":
+                maps = Utils.Nova
+        except Exception as e:
+            print(f"Error getting the map info {e}")
+
+        try:
             if nation.lower() == "random":
                 allNationsLookup = await Utils.Lookup.lookup(server, endpoint="nations")
                 nation = random.choice(allNationsLookup["allNations"])
 
             nationsLookup = await Utils.Lookup.lookup(server, endpoint="nations", name=nation)
-            locationUrl = f"https://earthmc.net/map/{server}/?zoom=4&x={nationsLookup['spawn']['x']}&z={nationsLookup['spawn']['z']}"
+            location = f"[{int(round(nationsLookup['spawn']['x'], 0))}, {int(round(nationsLookup['spawn']['z'], 0))}]"
 
             embed = Utils.Embeds.embed_builder(
                 title=f"`{nationsLookup['strings']['nation']}`",
@@ -44,7 +57,7 @@ class NationCommand(commands.Cog):
             embed.add_field(name="Capital", value=nationsLookup["strings"]["capital"], inline=True)
             embed.add_field(
                 name="Location",
-                value=f"[{int(round(nationsLookup['spawn']['x'], 0))}, {int(round(nationsLookup['spawn']['z'], 0))}]({locationUrl})",
+                value=location,
                 inline=True
             )
 
@@ -72,7 +85,7 @@ class NationCommand(commands.Cog):
 
         except Exception as e:
             embed = Utils.Embeds.error_embed(
-                value="An error occurred while processing your request.",
+                value="If it is not evident that the error was your fault, please report it",
                 footer=commandString
             )
 
@@ -152,8 +165,6 @@ class NationCommand(commands.Cog):
             )
 
             await inter.edit_original_response(embed=embed, ephemeral=True)
-
-# ... (previous code) ...
 
     @nation.sub_command(description="Retrieve and display the list of allies of a nation.")
     async def allylist(
@@ -327,88 +338,108 @@ class NationCommand(commands.Cog):
 
             await inter.edit_original_response(embed=embed, ephemeral=True)
 
-        @nation.sub_command(description="Retrieve and display the list of nations that match the specified keywords.")
-        async def list(
-                self,
-                inter: disnake.ApplicationCommandInteraction,
-                keyword: str = "chunks",
-                server: str = "aurora"
-        ):
+    @nation.sub_command(description="Retrieve and display the list of nations that match the specified keywords.")
+    async def list(
+            self,
+            inter: disnake.ApplicationCommandInteraction,
+            keyword: str = "chunks",
+            server: str = "aurora"
+    ):
 
-            commandString = f"/nation list keyword: {keyword} server: {server}"
+        commandString = f"/nation list keyword: {keyword} server: {server}"
 
-            await inter.response.defer()
+        await inter.response.defer()
 
-            try:
-                if keyword.lower() == "balance":
-                    nationsLookup = Utils.Lookup.lookup(server, endpoint="nations", sort="balance")
-                elif keyword.lower() == "residents":
-                    nationsLookup = Utils.Lookup.lookup(server, endpoint="nations", sort="residents")
-                else:
-                    nationsLookup = Utils.Lookup.lookup(server, endpoint="nations", sort="chunks")
+        try:
+            if keyword.lower() == "balance":
+                nationsLookup = Utils.Lookup.lookup(server, endpoint="nations", sort="balance")
+            elif keyword.lower() == "residents":
+                nationsLookup = Utils.Lookup.lookup(server, endpoint="nations", sort="residents")
+            else:
+                nationsLookup = Utils.Lookup.lookup(server, endpoint="nations", sort="chunks")
 
+            nation_names = [nation["name"] for nation in nationsLookup["allNations"]]
+            nation_list = Utils.CommandTools.list_to_string(list=nation_names)
 
+            embed = Utils.Embeds.embed_builder(
+                title=f"Nations Sorted by {keyword.capitalize()}",
+                description=f"```{nation_list}```",
+                footer=commandString,
+                author=inter.author
+            )
 
+            await inter.send(embed=embed, ephemeral=False)
 
-                nation_names = [nation["name"] for nation in nationsLookup["allNations"]]
-                nation_list = Utils.CommandTools.list_to_string(list=nation_names)
+        except Exception as e:
+            embed = Utils.Embeds.error_embed(
+                value="If it is not evident that the error was your fault, please report it",
+                footer=commandString
+            )
 
-                embed = Utils.Embeds.embed_builder(
-                    title=f"Nations Sorted by {keyword.capitalize()}",
-                    description=f"```{nation_list}```",
-                    footer=commandString,
-                    author=inter.author
-                )
+            await inter.send(embed=embed, ephemeral=True)
 
-                await inter.send(embed=embed, ephemeral=False)
+    @nation.sub_command(
+        description="Retrieve and display all the residents of a specified nation with their last login time.")
+    async def activity(
+            self,
+            inter: disnake.ApplicationCommandInteraction,
+            nation: str,
+            server: str = "aurora"
+    ):
+        """Retrieve and display all the residents of a specified nation with their last login time."""
+        commandString = f"/nation activity nation: {nation} server: {server}"
 
-            except Exception as e:
-                embed = Utils.Embeds.error_embed(
-                    value="If it is not evident that the error was your fault, please report it",
-                    footer=commandString
-                )
+        await inter.response.defer()
 
-                await inter.send(embed=embed, ephemeral=True)
+        try:
+            nationsLookup = Utils.Lookup.lookup(server, endpoint="nations", name=nation)
 
-        @nation.sub_command(
-                description="Retrieve and display all the residents of a specified nation with their last login time.")
+            embed = Utils.Embeds.embed_builder(
+                title=f"`{nationsLookup['strings']['nation']}'s Residents and Last Login Time`",
+                footer=commandString,
+                author=inter.author
+            )
 
-        async def activity(
-                self,
-                inter: disnake.ApplicationCommandInteraction,
-                nation: str,
-                server: str = "aurora"
-        ):
-            """Retrieve and display all the residents of a specified nation with their last login time."""
-            commandString = f"/nation activity nation: {nation} server: {server}"
+            residents_list = [f"{resident['name']} - Last Login: <t:{int(resident['lastLogin'] / 1000)}:R>"
+                              for resident in nationsLookup["residents"]]
+            residents_string = Utils.CommandTools.list_to_string(list=residents_list)
 
-            await inter.response.defer()
+            embed.add_field(name="Residents and Last Login Time", value=f"```{residents_string[:1018]}```",
+                            inline=True)
 
-            try:
-                nationsLookup = Utils.Lookup.lookup(server, endpoint="nations", name=nation)
+            await inter.send(embed=embed, ephemeral=False)
 
-                embed = Utils.Embeds.embed_builder(
-                    title=f"`{nationsLookup['strings']['nation']}'s Residents and Last Login Time`",
-                    footer=commandString,
-                    author=inter.author
-                )
+        except Exception as e:
+            embed = Utils.Embeds.error_embed(
+                value="If it is not evident that the error was your fault, please report it",
+                footer=commandString
+            )
 
-                residents_list = [f"{resident['name']} - Last Login: <t:{int(resident['lastLogin'] / 1000)}:R>"
-                                  for resident in nationsLookup["residents"]]
-                residents_string = Utils.CommandTools.list_to_string(list=residents_list)
+            await inter.send(embed=embed, ephemeral=True)
 
-                embed.add_field(name="Residents and Last Login Time", value=f"```{residents_string[:1018]}```",
-                                inline=True)
+    @nation.sub_command()
+    async def alert_nation_spawn(self,
+            inter: disnake.ApplicationCommandInteraction,
+            nation: str = "Jefferson",
+            server: str = "aurora"):
+        try:
+            maps = Utils.Aurora
+            if server == Aurora:
+                maps = Utils.Aurora
+        except Exception as e:
+            print(f"Error getting the map info {e}")
 
-                await inter.send(embed=embed, ephemeral=False)
+        try:
+            player = Utils.aurora
+            if server == Aurora:
+                player = Utils.aurora
 
-            except Exception as e:
-                embed = Utils.Embeds.error_embed(
-                    value="If it is not evident that the error was your fault, please report it",
-                    footer=commandString
-                )
+        except Exception as e:
+            print(f"Error getting the map info {e}")
 
-                await inter.send(embed=embed, ephemeral=True)
+        players = player.online.get('PlayerName')
+        residents = aurora.residents.all(nation)
+
 
 
 

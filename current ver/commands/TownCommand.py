@@ -1,12 +1,8 @@
 import random
 import disnake
 from disnake.ext import commands
-from disnake.ext.commands import InteractionBot
-import cachetools
-from cachetools import TTLCache
-
 import Utils as Utils
-bot: InteractionBot = commands.InteractionBot()
+
 class TownCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -75,7 +71,7 @@ class TownCommand(commands.Cog):
 
             embed.add_field(name="Residents", value=townsLookup["stats"]["numResidents"], inline=True)
             embed.add_field(
-                name="Chunks",
+                name="Town Blocks",
                 value=f"{townsLookup['stats']['numTownBlocks']}/{townsLookup['stats']['maxTownBlocks']} ({townsLookup['stats']['numTownBlocks'] * 16 + 48}G)",
                 inline=True
             )
@@ -266,184 +262,6 @@ class TownCommand(commands.Cog):
             )
             await inter.response.send_message(embed=embed, ephemeral=True)
 
-        @town.sub_command(
-            description="Retrieve and display all the residents of a specified nation with their last login time.")
-        async def activity(
-                self,
-                inter: disnake.ApplicationCommandInteraction,
-                nation: str,
-                server: str = "aurora"
-        ):
-            """Retrieve and display all the residents of a specified nation with their last login time."""
-            commandString = f"/nation activity nation: {nation} server: {server}"
-
-            await inter.response.defer()
-
-            try:
-                nationsLookup = Utils.Lookup.lookup(server, endpoint="towns", name=town)
-
-                embed = Utils.Embeds.embed_builder(
-                    title=f"`{nationsLookup['strings']['nation']}'s Residents and Last Login Time`",
-                    footer=commandString,
-                    author=inter.author
-                )
-
-                residents_list = [f"{resident['name']} - Last Login: <t:{int(resident['lastLogin'] / 1000)}:R>"
-                                  for resident in nationsLookup["residents"]]
-                residents_string = Utils.CommandTools.list_to_string(list=residents_list)
-
-                embed.add_field(name="Residents and Last Login Time", value=f"```{residents_string[:1018]}```",
-                                inline=True)
-
-                await inter.send(embed=embed, ephemeral=False)
-
-            except Exception as e:
-                embed = Utils.Embeds.error_embed(
-                    value="If it is not evident that the error was your fault, please report it",
-                    footer=commandString
-                )
-
-                await inter.send(embed=embed, ephemeral=True)
-
-        @town.sub_command(description="Retrieve and display the list of nations that match the specified keywords.")
-        async def list(
-                self,
-                inter: disnake.ApplicationCommandInteraction,
-                keyword: str = "chunks",
-                server: str = "aurora"
-        ):
-            """Retrieve and display the list of nations based on keywords 'chunks' or 'balance' or defaults to 'chunks'."""
-            commandString = f"/nation list keyword: {keyword} server: {server}"
-
-            await inter.response.defer()
-
-            try:
-                if keyword.lower() == "balance":
-                    townLookup = Utils.Lookup.lookup(server, endpoint="towns", sort="balance")
-                elif keyword.lower() == "residents":
-                    townLookup = Utils.Lookup.lookup(server, endpoint="towns", sort="residents")
-                else:
-                    townLookup = Utils.Lookup.lookup(server, endpoint="towns", sort="chunks")
-
-                nation_town = [town["name"] for town in townsLookup["allTowns"]]
-                town_list = Utils.CommandTools.list_to_string(list=nation_town)
-
-                embed = Utils.Embeds.embed_builder(
-                    title=f"Nations Sorted by {keyword.capitalize()}",
-                    description=f"```{town_list}```",
-                    footer=commandString,
-                    author=inter.author
-                )
-
-                await inter.send(embed=embed, ephemeral=False)
-
-            except Exception as e:
-                embed = Utils.Embeds.error_embed(
-                    value="If it is not evident that the error was your fault, please report it",
-                    footer=commandString
-                )
-
-                await inter.send(embed=embed, ephemeral=True)
-
-        # Define a global variable to store the cached towns data
-        towns_cache = TTLCache(maxsize=100, ttl=60)
-
-        @town.sub_command(description="Check for missing towns from the EarthMC API")
-        async def missing(ctx, server: str = "aurora"):
-            try:
-                # Fetch the towns from the API or use the cached data if available
-                if (server, "towns") in towns_cache:
-                    all_towns_lookup = towns_cache[(server, "towns")]
-                else:
-                    all_towns_lookup = await Utils.Lookup.lookup(server, endpoint="towns")
-                    towns_cache[(server, "towns")] = all_towns_lookup
-
-                # Extract the town names from the API response
-                api_towns = set(town["name"] for town in all_towns_lookup["allTowns"])
-
-                # Compare with the previous data (if available)
-                if (server, "missing_towns") in towns_cache:
-                    previous_towns = towns_cache[(server, "missing_towns")]
-                    missing_towns = previous_towns - api_towns
-                else:
-                    # If no previous data is available, consider all towns as missing
-                    missing_towns = api_towns
-
-                if not missing_towns:
-                    await ctx.send("All towns are up to date.")
-                else:
-                    # Fetch the missing town data from the API and add it to missing_towns_data list
-                    missing_towns_data = []  # Initialize the list to store missing town data
-
-                    for town in all_towns_lookup["allTowns"]:
-                        if town["name"] in missing_towns:
-                            x_coord = int(round(town["spawn"]["x"], 0))
-                            z_coord = int(round(town["spawn"]["z"], 0))
-                            location_url = f"https://earthmc.net/map/{server}/?zoom=4&x={x_coord}&z={z_coord}"
-                            location = f"[{x_coord}, {z_coord}]({location_url})"
-                            missing_towns_data.append(f"{town['name']} - Location: {location}")
-
-                    # If you have other missing town data to add to the list, you can do it here
-                    # For example:
-                    # missing_towns_data.append("Some other missing town data")
-
-                    missing_towns_str = "\n".join(missing_towns_data)
-                    await ctx.send(f"The following towns are missing:\n{missing_towns_str}")
-
-                # Update the cache with the current towns data
-                towns_cache[(server, "missing_towns")] = api_towns
-
-            except Exception as e:
-                await ctx.send("An error occurred while fetching town data.")
-
-        # Function to calculate distance between two coordinates
-        def calculate_distance(x1, z1, x2, z2):
-            return ((x2 - x1) ** 2 + (z2 - z1) ** 2) ** 0.5
-
-        # Function to fetch all town data from the API
-        async def fetch_town_data(server):
-            all_towns_lookup = await Utils.Lookup.lookup(server, endpoint="towns")
-            return all_towns_lookup["allTowns"]
-
-        # Function to filter towns based on player's location and nation
-        async def filter_towns_by_location(player_x, player_z, nation_name, server):
-            towns = await fetch_town_data(server)
-            nearby_towns = []
-
-            for town in towns:
-                town_x = town["spawn"]["x"]
-                town_z = town["spawn"]["z"]
-                distance = calculate_distance(player_x, player_z, town_x, town_z)
-                if distance < 1000 and town["affiliation"]["nation"] == nation_name:
-                    nearby_towns.append(town)
-
-            return nearby_towns
-
-        @town.sub_command(
-            description="Check if a player is near the spawn of a town in the specified nation (Jefferson)")
-        async def check_near_town_spawn(ctx, player_name: str, server: str = "aurora"):
-            nation_name = "Jefferson"
-
-            try:
-                # Fetch player data from the API
-                player_data = await Utils.Lookup.lookup(server, endpoint="players", name=player_name)
-
-                # Get player's coordinates
-                player_x = player_data["x"]
-                player_z = player_data["z"]
-
-                # Filter towns based on player's location and nation
-                nearby_towns = await filter_towns_by_location(player_x, player_z, nation_name, server)
-
-                if nearby_towns:
-                    town_names = ", ".join(town["name"] for town in nearby_towns)
-                    await ctx.send(f"{player_name} is near the spawn of these towns of {nation_name}: {town_names}")
-                else:
-                    await ctx.send(f"{player_name} is not near any town spawn of {nation_name}")
-
-            except Exception as e:
-                await ctx.send("An error occurred while fetching player data or town data.")
-
-
 def setup(bot):
     bot.add_cog(TownCommand(bot))
+

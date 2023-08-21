@@ -1,8 +1,8 @@
 import disnake
 from disnake.ext import commands
 import aiohttp
-from Utils import *
-import Utils as Utils
+
+
 class ModerationCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot

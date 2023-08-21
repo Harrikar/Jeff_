@@ -2,10 +2,8 @@ import datetime
 import disnake
 import aiohttp
 import traceback
-import cachetools
 from cachetools import TTLCache
-import pymongo
-from pymongo import MongoClient
+
 class CommandTools:
     def list_to_string(*args):
         return "\n".join(str(item) for item in args)
@@ -63,19 +61,8 @@ class CommandTools:
 
         return rnaoPermsList
 
-
 class Lookup:
-    # MongoDB Atlas connection information
-    MONGODB_CONNECTION_STRING = "mongodb+srv://chariskarametos:<030181k@r>@cluster0.mx2svkq.mongodb.net/"
-    DATABASE_NAME = "Cluster0"
-    PLAYER_COLLECTION = "player_data"
-
-    # Create a MongoClient instance
-    client = MongoClient(MONGODB_CONNECTION_STRING)
-    # Access the database
-    db = client[DATABASE_NAME]
-    # Access the player collection
-    player_collection = db[PLAYER_COLLECTION]
+    server_lookup_cache = TTLCache(maxsize=100, ttl=60)
 
     @classmethod
     async def lookup(cls, server, endpoint=None, name=None):
@@ -86,7 +73,7 @@ class Lookup:
         else:
             api_url = f"https://api.earthmc.net/v1/{server}/{endpoint}/{name}"
 
-            # Check if the data is already cached
+        # Check if the data is already cached
         if (server, endpoint, name) in cls.server_lookup_cache:
             return cls.server_lookup_cache[(server, endpoint, name)]
 
@@ -94,29 +81,10 @@ class Lookup:
             async with session.get(api_url) as response:
                 lookup = await response.json()
 
-            # Cache the data to avoid future API calls for the same lookup
+        # Cache the data to avoid future API calls for the same lookup
         cls.server_lookup_cache[(server, endpoint, name)] = lookup
 
         return lookup
-
-    @classmethod
-    async def player_lookup(cls, username):
-        # Check if the data is already cached in MongoDB
-        player_data = cls.player_collection.find_one({"username": username})
-        if player_data:
-            return player_data
-
-        # Fetch player data from the API if not found in MongoDB
-        api_url = f"https://api.earthmc.net/v1/players/{username}"
-
-        async with aiohttp.ClientSession() as session:
-            async with session.get(api_url) as response:
-                player_data = await response.json()
-
-        # Cache the data in MongoDB to avoid future API calls for the same player
-        cls.player_collection.insert_one(player_data)
-
-        return player_data
 
 
 
@@ -124,7 +92,7 @@ class Embeds():
 
      @staticmethod
      def embed_builder(title, description=None, author=None, footer=None, thumbnail=None, maintain_bot=False,
-                        your_name="Charis_K"):
+                        your_name=None):
         embed = disnake.Embed(
             title=title,
             description=description,
@@ -134,7 +102,7 @@ class Embeds():
 
         if author is not None:
             if maintain_bot:
-                bot_name = "Jeff_"  # Replace this with your actual bot name
+                bot_name = "YourBotName"  # Replace this with your actual bot name
                 embed.set_author(
                     name=f"Queried by {author.display_name} - Maintained by {bot_name}",
                     icon_url=author.avatar.url if author.avatar else None
