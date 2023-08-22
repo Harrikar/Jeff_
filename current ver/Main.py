@@ -18,7 +18,7 @@ async def on_ready():
 
 # bot.load_extension loads a file from another directory in this case the commands directory it loads all the scripts
 
-bot.load_extension("commands.ServerCommand")
+#bot.load_extension("commands.ServerCommand")
 bot.load_extension("commands.ResCommand")
 bot.load_extension("commands.TownCommand")
 bot.load_extension("commands.NationCommand")
@@ -26,10 +26,13 @@ bot.load_extension("commands.ModerationCommands")
 bot.load_extension("commands.RoleManaging")
 bot.load_extension("commands.LevelingSystem")
 bot.load_extension("commands.VotingSystem")
-#bot.load_extension("commands.weather")
-#bot.load_extension("commands.AllianceCommand")
+bot.load_extension("commands.weather")
+bot.load_extension("commands.AllianceCommand")
 
-token = (" MTEyMTc1MTQwMDI5NzI3OTU0OQ.GQC2YE.Wkh7RKdZj6MDtm73pseXD1oE__JFLfqCXpk8_U")
+
+token = " MTEyMTc1MTQwMDI5NzI3OTU0OQ.GQC2YE.Wkh7RKdZj6MDtm73pseXD1oE__JFLfqCXpk8_U"
+
+
 if token:
     bot.run(token)
 else:
