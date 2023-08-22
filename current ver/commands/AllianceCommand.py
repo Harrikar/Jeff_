@@ -1,7 +1,8 @@
 import disnake
 from disnake.ext import commands
 import Utils
-
+from Utils import *
+import aiohttp  # Import aiohttp library for making HTTP requests
 
 class AllianceCommand(commands.Cog):
     def __init__(self, bot):
@@ -12,17 +13,21 @@ class AllianceCommand(commands.Cog):
         await inter.response.send_message("Please specify a sub-command. Use `/alliance info` for general alliance information.")
 
     @alliance.sub_command(base="alliance", name="info", description="Retrieve and display general information about an alliance.")
-    async def info(self, inter: disnake.ApplicationCommandInteraction, alliance: str):
+    async def search(self, inter: disnake.ApplicationCommandInteraction, alliance: str):
         """Retrieve and display general information about an alliance."""
         commandString = f"/alliance info {alliance}"
 
         try:
             await inter.response.defer()
 
-            allianceInfo = await Utils.lookup("alliances", name=alliance)  # Use the lookup function from commands module
+            async with aiohttp.ClientSession() as session:
+                url = f"https://emctoolkit.vercel.app/api/aurora/alliances?name={alliance}"
+                async with session.get(url) as response:
+                    allianceInfo = await response.json()
+
             members = ", ".join(allianceInfo.get("nations", ["None"]))
 
-            embed = Utils.embed_builder(  # Use the embed_builder function from commands module
+            embed = Utils.Embeds.embed_builder(
                 title=f"{allianceInfo['tag']} {allianceInfo['name']}",
                 description=allianceInfo["description"],
                 footer=commandString,
@@ -37,7 +42,7 @@ class AllianceCommand(commands.Cog):
             await inter.edit_original_message(embed=embed)
 
         except Exception as e:
-            embed = Utils.error_embed(  # Use the error_embed function from commands module
+            embed = Utils.error_embed(
                 title="Error",
                 description="An error occurred while processing your request. If the error wasn't on your side, I advise reporting the bug so it can be fixed.",
                 footer=commandString
@@ -47,3 +52,4 @@ class AllianceCommand(commands.Cog):
 
 def setup(bot):
     bot.add_cog(AllianceCommand(bot))
+

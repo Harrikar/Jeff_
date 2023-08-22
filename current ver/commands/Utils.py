@@ -73,6 +73,8 @@ class Lookup:
         else:
             api_url = f"https://api.earthmc.net/v1/{server}/{endpoint}/{name}"
 
+
+
         # Check if the data is already cached
         if (server, endpoint, name) in cls.server_lookup_cache:
             return cls.server_lookup_cache[(server, endpoint, name)]
