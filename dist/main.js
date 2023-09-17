@@ -43,12 +43,14 @@ var Discord = require("discord.js");
 var dotenv = require("dotenv");
 var sends_1 = require("./src/utils/sends");
 var weather_1 = require("./src/weather");
+var levels_1 = require("./src/levels");
 var client = new Discord.Client();
 var Send = new sends_1.send(client);
 var nationCommand = new Nations_1.Nations(client, Send);
 var townCommand = new Towns_1.TownCommand(client, Send);
 var playerCommand = new Players_1.playercommand(client, Send);
 var weathercommand = new weather_1.Weather(client, Send);
+var level = new levels_1.Level(client, Send);
 dotenv.config();
 client.on('message', function (message) { return __awaiter(void 0, void 0, void 0, function () {
     var args, command, subCommand, subCommand, subCommand, subCommand;
@@ -107,7 +109,7 @@ client.on('message', function (message) { return __awaiter(void 0, void 0, void 
             case 15:
                 _f.sent();
                 _f.label = 16;
-            case 16: return [3 /*break*/, 33];
+            case 16: return [3 /*break*/, 36];
             case 17:
                 if (!(command === '/town')) return [3 /*break*/, 24];
                 subCommand = (_c = args[0]) === null || _c === void 0 ? void 0 : _c.toLowerCase();
@@ -128,7 +130,7 @@ client.on('message', function (message) { return __awaiter(void 0, void 0, void 
             case 22:
                 _f.sent();
                 _f.label = 23;
-            case 23: return [3 /*break*/, 33];
+            case 23: return [3 /*break*/, 36];
             case 24:
                 if (!(command === '/player')) return [3 /*break*/, 31];
                 subCommand = (_d = args[0]) === null || _d === void 0 ? void 0 : _d.toLowerCase();
@@ -149,16 +151,23 @@ client.on('message', function (message) { return __awaiter(void 0, void 0, void 
             case 29:
                 _f.sent();
                 _f.label = 30;
-            case 30: return [3 /*break*/, 33];
+            case 30: return [3 /*break*/, 36];
             case 31:
-                if (!(command === '/weather')) return [3 /*break*/, 33];
+                if (!(command === '/weather')) return [3 /*break*/, 34];
                 subCommand = (_e = args[0]) === null || _e === void 0 ? void 0 : _e.toLowerCase();
                 if (!(subCommand === '/weather search')) return [3 /*break*/, 33];
                 return [4 /*yield*/, weathercommand.search(args[1])];
             case 32:
                 _f.sent();
                 _f.label = 33;
-            case 33: return [2 /*return*/];
+            case 33: return [3 /*break*/, 36];
+            case 34:
+                if (!(command === '/levels show')) return [3 /*break*/, 36];
+                return [4 /*yield*/, level.showlevel(args[1])];
+            case 35:
+                _f.sent();
+                _f.label = 36;
+            case 36: return [2 /*return*/];
         }
     });
 }); });

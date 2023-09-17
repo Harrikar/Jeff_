@@ -5,7 +5,7 @@ import * as Discord from 'discord.js';
 import * as dotenv from 'dotenv'
 import {send} from './src/utils/sends';
 import { Weather } from './src/weather';
-
+import { Level } from './src/levels';
 
 const client = new Discord.Client();
 const Send = new send(client);
@@ -13,6 +13,7 @@ const nationCommand = new Nations(client,Send);
 const townCommand = new TownCommand(client,Send);
 const playerCommand = new playercommand(client,Send);
 const weathercommand = new Weather(client,Send)
+const level = new Level(client,Send)
 dotenv.config();
 
 
@@ -67,9 +68,13 @@ client.on('message', async (message) => {
             await weathercommand.search(args[1])
         }
     }
+    else if (command === '/levels show'){
+        await level.showlevel(args[1])
+    }
 });
 
 try{
+    
     const token = process.env.TOKEN
     client.login(token);
 }

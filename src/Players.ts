@@ -14,6 +14,7 @@ class playercommand{
         this.Send = Send;
     }
 
+    
     async player() {
         try {
             if (!this.entity.user) {

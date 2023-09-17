@@ -33,17 +33,21 @@ class Level {
 
           if (userSnapshot.exists) {
             const user = userSnapshot.data()!;
-            const level_2exp = 100 + 20;
-            const newlevel = level_2exp + 40;
+   
             const xp_upd = {
               xp: user.xp + 1
             }
+            let Level = 100;
+            function level(){
+              Level =+ 20
+            }
 
             await usersCollection.doc(userId).update(xp_upd);
-
-            if (user.xp > newlevel) {
+            
+            if (user.xp > Level) {
               const newlvl = {
-                level: user.level + 1
+                level,
+                Level: user.level + 1
               };
 
               // Update the level in the 'users' collection
@@ -54,7 +58,7 @@ class Level {
             // If the user doesn't exist, add them to the 'users' collection
             const user_data = {
               id: userId,
-              level: 1,
+              Level: 0,
               xp: 0,
               name: message.author.username
             };  
@@ -112,6 +116,24 @@ class Level {
       this.Send.sendErrorEmbed(error);
     }
   }
+  async onUserUpdate(oldUser, newUser) {
+    try {
+      const oldUsername = oldUser.username;
+      const newUsername = newUser.username;
+
+      // Check if the username has changed
+      if (oldUsername !== newUsername) {
+        // Update the associated username in the database
+        const usernameDoc = await db.collection('usernames').doc(oldUsername).get();
+        if (usernameDoc.exists) {
+          const userId = usernameDoc.data()!.userId;
+          await db.collection('usernames').doc(oldUsername).update(newUsername)          
+        }
+      }
+    } catch (error) {
+      throw new error (error)
+    }
+  } 
 
 
 }

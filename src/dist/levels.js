@@ -58,7 +58,10 @@ var Level = /** @class */ (function () {
                 usersCollection = db.collection('users');
                 usernamesCollection = db.collection('usernames');
                 this.entity.on('message', function (message) { return __awaiter(_this, void 0, void 0, function () {
-                    var userId, userRef, userSnapshot, user, level_2exp, newlevel, xp_upd, newlvl, user_data, error_1;
+                    function level() {
+                        Level_1 = +20;
+                    }
+                    var userId, userRef, userSnapshot, user, xp_upd, Level_1, newlvl, user_data, error_1;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
@@ -71,17 +74,17 @@ var Level = /** @class */ (function () {
                                 userSnapshot = _a.sent();
                                 if (!userSnapshot.exists) return [3 /*break*/, 5];
                                 user = userSnapshot.data();
-                                level_2exp = 100 + 20;
-                                newlevel = level_2exp + 40;
                                 xp_upd = {
                                     xp: user.xp + 1
                                 };
+                                Level_1 = 100;
                                 return [4 /*yield*/, usersCollection.doc(userId).update(xp_upd)];
                             case 2:
                                 _a.sent();
-                                if (!(user.xp > newlevel)) return [3 /*break*/, 4];
+                                if (!(user.xp > Level_1)) return [3 /*break*/, 4];
                                 newlvl = {
-                                    level: user.level + 1
+                                    level: level,
+                                    Level: user.level + 1
                                 };
                                 // Update the level in the 'users' collection
                                 return [4 /*yield*/, usersCollection.doc(userId).update(newlvl)];
@@ -93,7 +96,7 @@ var Level = /** @class */ (function () {
                             case 5:
                                 user_data = {
                                     id: userId,
-                                    level: 1,
+                                    Level: 0,
                                     xp: 0,
                                     name: message.author.username
                                 };
@@ -164,6 +167,34 @@ var Level = /** @class */ (function () {
                         this.Send.sendErrorEmbed(error_2);
                         return [3 /*break*/, 11];
                     case 11: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    Level.prototype.onUserUpdate = function (oldUser, newUser) {
+        return __awaiter(this, void 0, void 0, function () {
+            var oldUsername, newUsername, usernameDoc, userId, error_3;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 4, , 5]);
+                        oldUsername = oldUser.username;
+                        newUsername = newUser.username;
+                        if (!(oldUsername !== newUsername)) return [3 /*break*/, 3];
+                        return [4 /*yield*/, db.collection('usernames').doc(oldUsername).get()];
+                    case 1:
+                        usernameDoc = _a.sent();
+                        if (!usernameDoc.exists) return [3 /*break*/, 3];
+                        userId = usernameDoc.data().userId;
+                        return [4 /*yield*/, db.collection('usernames').doc(oldUsername).update(newUsername)];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3: return [3 /*break*/, 5];
+                    case 4:
+                        error_3 = _a.sent();
+                        throw new error_3(error_3);
+                    case 5: return [2 /*return*/];
                 }
             });
         });
