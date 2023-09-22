@@ -1,11 +1,14 @@
-import { Client, MessageEmbed} from 'discord.js';
+import { Client} from 'discord.js';
 import {CommandTools} from "./utils/CommandTools";
-import {send} from './utils/sends';
-import { OfficialApi, Aurora } from 'earthmc';
+import {send} from './utils/send';
+import {  Aurora } from 'earthmc';
+import {OfficialApi} from 'earthmc'; 
+
 
 class Nations{
    private entity: Client;
    private Send: send
+
   constructor(entity: Client,Send:send) {
     this.entity = entity;
     this.Send = Send;
@@ -41,16 +44,13 @@ class Nations{
             const nations = OfficialApi.nation(nation);
             const locationUrl = `https://earthmc.net/map/${server}/?zoom=4&x=${nations.spawn.x}&z=${nations.spawn.z}`;
 
-            const embed = new MessageEmbed()
-                .setTitle(`\`${nations.strings.nation}\``)
-                .setDescription(nations.strings.board)
-                .setFooter(commandString)
-                .setAuthor(this.entity.user);
+            
 
             const chunks_worth = nations.Chunks * 16;
             const alliance = Aurora.alliance(nation);
 
-            embed.addFields(
+            const fields= [
+                {name:'',value:this.entity.user.avatarURL,inline:true},
                 { name: 'Name', value: nations.name, inline: true },
                 { name: "King", value: nations.King, inline: true },
                 { name: "Capital", value: nations.Capital, inline: true },
@@ -61,9 +61,11 @@ class Nations{
                 { name: "Towns", value: nations.stats.numTowns.toString(), inline: true },
                 
                 { name: `Chunks (${chunks_worth} worth of gold)`, value: nations.Chunks, inline: true },
-            );
+                {name:`Quoried by ${this.entity.user.username}`,inline:true},
+                {name:'bot desinged and coded by charis_k',inline:true}
+            ]
 
-            await this.Send.sendUserEmbed(embed);
+            await this.Send.sendUserEmbed(fields);
 
         } catch (e) {
             await this.Send.sendErrorEmbed(e);
@@ -77,16 +79,13 @@ class Nations{
 
             const nations = OfficialApi.nation(nation);
 
-            const embed = new MessageEmbed()
-                .setTitle(`\`${nations.strings.nation}'s Residents\``)
-                .setFooter(commandString)
-                .setAuthor(this.entity.user);
+            
 
             const residentsString = CommandTools.listToString(nations.residents);
 
-            embed.addField("Residents", "```" + residentsString.slice(0, 1018) + "```", true);
+            const fields = ["Residents", "```" + residentsString.slice(0, 1018) + "```", true]
 
-            await this.Send.sendUserEmbed(embed);
+            await this.Send.sendUserEmbed(fields);
 
         } catch (e) {
             await this.Send.sendErrorEmbed(e);
@@ -99,20 +98,18 @@ class Nations{
 
             const nations = OfficialApi.nation(nation);
 
-            const embed = new MessageEmbed()
-                .setTitle(`\`${nations.rank}'s Ranked Residents\``)
-                .setFooter(commandString)
-                .setAuthor(this.entity.user);
+            
 
             for (const rank in nations.ranks) {
                 if (nations.ranks.hasOwnProperty(rank)) {
                     const rankString = CommandTools.listToString(nations.ranks[rank]);
 
-                    embed.addField(rank.charAt(0).toUpperCase() + rank.slice(1), "```" + rankString.slice(0, 1022) + "```", true);
+                    const fields = [rank.charAt(0).toUpperCase() + rank.slice(1), "```" + rankString.slice(0, 1022) + "```", true]
+                    await this.Send.sendUserEmbed(fields);
                 }
             }
 
-            await this.Send.sendUserEmbed(embed);
+            
 
         } catch (e) {
             await this.Send.sendErrorEmbed(e);
@@ -125,21 +122,19 @@ class Nations{
 
             const nations = OfficialApi.nation(nation);
 
-            const embed = new MessageEmbed()
-                .setTitle(`\`${nations.allies}'s Allies\``)
-                .setFooter(commandString)
-                .setAuthor(this.entity.user);
+            
 
             if (nations.allies.length !== 0) {
                 const alliesString = CommandTools.listToString(nations.allies);
 
-                embed.addField("Allies", "```" + alliesString.slice(0, 1018) + "```", true);
-
+                const fields = ["Allies", "```" + alliesString.slice(0, 1018) + "```", true]
+                await this.Send.sendUserEmbed(fields);
             } else {
-                embed.addField("Allies", `${nations.allies} has no allies :)`, true);
+                const fields = ["Allies", `${nations.allies} has no allies :)`, true]
+                await this.Send.sendUserEmbed(fields);
             }
 
-            await this.Send.sendUserEmbed(embed);
+           
 
         } catch (e) {
             await this.Send.sendErrorEmbed(e);
@@ -152,21 +147,19 @@ class Nations{
 
             const nations = OfficialApi.nation(nation);
 
-            const embed = new MessageEmbed()
-                .setTitle(`\`${nations} Enemies\``) // Please replace with appropriate property
-                .setFooter(commandString)
-                .setAuthor(this.entity.user);
-
+            
             if (nations.enemies.length !== 0) {
                 const enemiesString = CommandTools.listToString(nations.enemies);
 
-                embed.addField("Enemies", "```" + enemiesString.slice(0, 1018) + "```", true);
+                const fields = ["Enemies", "```" + enemiesString.slice(0, 1018) + "```", true];
+                await this.Send.sendUserEmbed(fields);
 
             } else {
-                embed.addField("Enemies", `${nations.enemies} has no enemies :)`, true);
+                const fields = ["Enemies", `${nations.enemies} has no enemies :)`, true];
+                await this.Send.sendUserEmbed(fields);
             }
 
-            await this.Send.sendUserEmbed(embed);
+            
 
         } catch (e) {
             await this.Send.sendErrorEmbed(e);
@@ -179,16 +172,12 @@ class Nations{
 
             const nations = OfficialApi.nation(nation);
 
-            const embed = new MessageEmbed()
-                .setTitle(`\`${nations.strings.nation}'s Towns\``)
-                .setFooter(commandString)
-                .setAuthor(this.entity.user);
 
             const townsString = CommandTools.listToString(nations.towns);
 
-            embed.addField("Towns", "```" + townsString.slice(0, 1018) + "```", true);
+            const fields = ["Towns", "```" + townsString.slice(0, 1018) + "```", true]
 
-            await this.Send.sendUserEmbed(embed);
+            await this.Send.sendUserEmbed(fields);
 
         } catch (e) {
             await this.Send.sendErrorEmbed(e);
@@ -202,10 +191,7 @@ class Nations{
             const nations = OfficialApi.nation(nation);
             const allNationsLookup = OfficialApi.nation.all();
 
-            const embed = new MessageEmbed()
-                .setTitle(`\`${nations.strings.nation}'s Unallied Nations\``)
-                .setFooter(commandString)
-                .setAuthor(this.entity.user);
+            
 
             const allyList = nations.allies;
             const allNations = allNationsLookup.allNations.slice();
@@ -217,14 +203,16 @@ class Nations{
             if (unalliedList.length !== 0) {
                 for (let i = 0; i < unalliedList.length; i += 15) {
                     const unalliedString = unalliedList.slice(i, i + 15).join(' ');
-                    embed.addField(i > 0 ? 'Unallied (Continued)' : 'Unallied', "```" + unalliedString + "```", true);
+                    const fields = [i > 0 ? 'Unallied (Continued)' : 'Unallied', "```" + unalliedString + "```", true]
+                    await this.Send.sendUserEmbed(fields);
                 }
 
             } else {
-                embed.addField("Unallied", `${nations.unallied} has allied everyone :)`, true);
+                const fields = ["Unallied", `${nations.unallied} has allied everyone :)`, true]
+                await this.Send.sendUserEmbed(fields);
             }
 
-            await this.Send.sendUserEmbed(embed);
+            
 
         } catch (e) {
             await this.Send.sendErrorEmbed(e);

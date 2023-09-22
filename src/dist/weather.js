@@ -37,8 +37,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.Weather = void 0;
-var discord_js_1 = require("discord.js");
-var axios_1 = require("axios");
 var Weather = /** @class */ (function () {
     function Weather(entity, Send) {
         this.entity = entity;
@@ -78,18 +76,17 @@ var Weather = /** @class */ (function () {
                     case 0:
                         _a.trys.push([0, 3, , 5]);
                         commandString = "weather of " + location + " in " + units;
-                        apiKey = process.env.OPENWEATHER;
+                        apiKey = '7ef56e400a62114e2f5ec8ccd15b1ddb';
                         url = "https://api.openweathermap.org/data/2.5/weather?q=" + location + "&units=" + units + "&appid=" + apiKey;
-                        return [4 /*yield*/, axios_1["default"].get(url)];
+                        return [4 /*yield*/, ];
                     case 1:
                         response = _a.sent();
                         weatherData = response.data;
-                        embed = new discord_js_1.MessageEmbed()
-                            .setTitle("Weather in " + location)
-                            .addField('Temperature', weatherData.main.temp + " " + units, true)
-                            .setFooter(commandString)
-                            .setAuthor(this.entity.user);
-                        embed.addFields({ name: 'Location', value: location, inline: true }, { name: 'Units', value: units, inline: true }, { name: 'Temp', value: weatherData.main.temp + " " + units, inline: true });
+                        embed = [
+                            { name: 'Location', value: location, inline: true },
+                            { name: 'Units', value: units, inline: true },
+                            { name: 'Temp', value: weatherData.main.temp + " " + units, inline: true },
+                        ];
                         return [4 /*yield*/, this.Send.sendUserEmbed(embed)];
                     case 2:
                         _a.sent();

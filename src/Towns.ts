@@ -1,12 +1,13 @@
-import { Client, MessageEmbed } from 'discord.js';
-import {CommandTools} from "./utils/CommandTools";
-import { OfficialApi, Aurora } from 'earthmc';
-import {send} from './utils/sends'
+import { Client } from 'discord.js';
+import { CommandTools } from "./utils/CommandTools";
+import { OfficialApi } from 'earthmc';
+import { send } from './utils/send';
 
 class TownCommand {
     private entity: Client;
-    private Send : send
-    constructor(entity: Client,Send:send) {
+    private Send: send;
+
+    constructor(entity: Client, Send: send) {
         this.entity = entity;
         this.Send = Send;
     }
@@ -32,35 +33,24 @@ class TownCommand {
                 throw new Error("User is null or undefined.");
             }
 
-            if (town.toLowerCase() === "random") {
-                const allTownsLookup = OfficialApi.towns.all;
-                town = String(CommandTools.random_choice(allTownsLookup.allTowns));
-            }
+            const townlookup = OfficialApi.town(town)
+            const locationUrl = `https://earthmc.net/map/${server}/?zoom=4&x=${townlookup.spawn.x}&z=${townlookup.spawn.z}`;
 
-            const towns = OfficialApi.town(town);
-            const Mayor = OfficialApi.townsLookup.Mayor;
+            const fields = [
+                {name:'Name',value:town,inline:true},
+                {name:'Residents',value:townlookup.residents.toString(),inline:true},
+                {name:`chunks`,value:townlookup.chunks.toString(),inline:true},
+                {name:'worth',value:Number(townlookup.chunks * 16 ),inline:true},
+                {name:'Nation',value:townlookup.nation,inline:true},
+                {name:'Mayor',value:townlookup.Mayor,inline:true},
+                {name:'Capital',value:townlookup.Capital,inline:true},
+                { name: "Location", value: `[${Math.round(townlookup.spawn.x)}, ${Math.round(townlookup.spawn.z)}](${locationUrl})`, inline: true },
+                {name:`Quoried by ${this.entity.user.username}`,inline:true},
+                {name:'bot desinged and coded by charis_k',inline:true}
 
-            const embed = new MessageEmbed()
-                .setTitle(`\`${towns.strings.nation}\``)
-                .setDescription(towns.strings.board)
-                .setFooter(commandString)
-                .setAuthor(this.entity.user);
+            ]
 
-            const chunks_worth = towns.Chunks.worth()
-            const town_spawn_x = towns.spawn.x;
-            const town_spawn_z = towns.spawn.z;
-            const town_spawn = town_spawn_x + ',' + town_spawn_z ;
-            embed.addFields(
-                { name: 'Name', value: towns.name, inline: true },
-                { name: "Mayor", value: Mayor, inline: true },
-                { name:'Nation',value:towns.nation, inline: true},
-                { name:'Balance',value:towns.balance, inline: true},
-                { name:` Chunks (worth ${chunks_worth})`,value:towns.Chunks, inline: true},
-                { name:' Resident',value:towns.numResidents, inline: true},
-                { name:"Spawn",value:towns.town_spawn, inline: true}
-            );
-
-            await this.Send.sendUserEmbed(embed);
+            await this.Send.sendUserEmbed(fields);
 
         } catch (e) {
             await this.Send.sendErrorEmbed(e);
@@ -73,27 +63,22 @@ class TownCommand {
 
             const townsLookup = OfficialApi.town(town);
 
-            const embed = new MessageEmbed()
-                .setTitle(`\`${townsLookup.rank}'s Ranked Residents\``)
-                .setFooter(commandString)
-                .setAuthor(this.entity.user);
+            let embedString = `**${townsLookup.rank}'s Ranked Residents**\n`;
 
             for (const rank in townsLookup.ranks) {
                 if (townsLookup.ranks.hasOwnProperty(rank)) {
                     const rankString = CommandTools.listToString(townsLookup.ranks[rank]);
 
-                    embed.addField(rank.charAt(0).toUpperCase() + rank.slice(1), "```" + rankString.slice(0, 1022) + "```", true);
+                    embedString += `${rank.charAt(0).toUpperCase() + rank.slice(1)}:\n\`\`\`${rankString.slice(0, 1022)}\`\`\`\n`;
                 }
             }
 
-            await this.Send.sendUserEmbed(embed);
+            await this.Send.sendUserMessage(embedString);
 
         } catch (e) {
             await this.Send.sendErrorEmbed(e);
         }
     }
-
-
 }
 
-export {TownCommand}
+export { TownCommand }

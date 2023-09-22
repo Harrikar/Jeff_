@@ -1,7 +1,7 @@
-import { Client, Message,MessageEmbed } from 'discord.js';
-import { send } from './utils/sends';
+import { Client, Message } from 'discord.js';
+import { send } from './utils/send';
 import * as admin from 'firebase-admin';
-const serviceAccount = require('jeff-db-firebase-adminsdk-qekso-80d55b4f4c.json');
+const serviceAccount = require("./jeff-db-firebase-adminsdk-qekso-80d55b4f4c.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -9,7 +9,7 @@ admin.initializeApp({
 });
 
 
-const db = admin.firestore(); 
+const db = admin.firestore()
 
 class Level {
   private entity: Client;
@@ -92,20 +92,10 @@ class Level {
         
         if (userDoc.exists) {
           const userData = userDoc.data()!;
-          const embed = new MessageEmbed()
-            .setTitle(`\`${commandString}\``)
-            .setDescription('User level')
-            .setFooter(commandString)
-            .setAuthor(this.entity.user);
+          const commandString = `Level of ${username}`;
+          const response = `User level: ${userData.level} (XP: ${userData.xp})`;
 
-          embed.addFields(
-            { name: 'Name', value: username, inline: true },
-            { name: 'Level and XP', value: `${userData.level} (XP: ${userData.xp})`, inline: true }
-          );
-        
-         
-
-          await this.Send.sendUserEmbed(embed);
+          await this.Send.sendUserMessage(response);
         } else {
           await this.Send.sendUserMessage('User data not found.');
         }
@@ -131,10 +121,9 @@ class Level {
         }
       }
     } catch (error) {
-      throw new error (error)
+      throw new Error(error);
     }
   } 
-
-
 }
+
 export {Level}
