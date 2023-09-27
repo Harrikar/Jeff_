@@ -38,12 +38,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.playercommand = void 0;
 var discord_js_1 = require("discord.js");
-var CommandTools_1 = require("./utils/CommandTools");
 var earthmc_1 = require("earthmc");
 var playercommand = /** @class */ (function () {
-    function playercommand(entity, Send) {
+    function playercommand(entity, send) {
         this.entity = entity;
-        this.Send = Send;
+        this.send = send;
     }
     playercommand.prototype.player = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -55,13 +54,13 @@ var playercommand = /** @class */ (function () {
                         if (!this.entity.user) {
                             throw new Error("User is null or undefined.");
                         }
-                        return [4 /*yield*/, this.Send.sendUserMessage("This is the main /player command. Use subcommands like /player search")];
+                        return [4 /*yield*/, this.send.sendUserMessage("This is the main /player command. Use subcommands like /player search")];
                     case 1:
                         _a.sent();
                         return [3 /*break*/, 4];
                     case 2:
                         e_1 = _a.sent();
-                        return [4 /*yield*/, this.Send.sendErrorEmbed(e_1)];
+                        return [4 /*yield*/, this.send.sendErrorsend(e_1)];
                     case 3:
                         _a.sent();
                         return [3 /*break*/, 4];
@@ -71,122 +70,109 @@ var playercommand = /** @class */ (function () {
         });
     };
     playercommand.prototype.search = function (player) {
-        if (player === void 0) { player = "random"; }
         return __awaiter(this, void 0, void 0, function () {
-            var server, commandString, allPlayerLookup, players, embed, e_2;
+            var server, commandString, players, embed, e_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 4]);
+                        _a.trys.push([0, 3, , 5]);
                         server = 'aurora';
                         commandString = "/player search : " + player + " server: " + server;
                         if (!this.entity.user) {
                             throw new Error("User is null or undefined.");
                         }
-                        if (player.toLowerCase() === "random") {
-                            allPlayerLookup = earthmc_1.OfficialApi.players.all;
-                            player = String(CommandTools_1.CommandTools.random_choice(allPlayerLookup.allPlayers));
-                        }
-                        players = earthmc_1.OfficialApi.player(player);
-                        embed = new discord_js_1.MessageEmbed()
-                            .setTitle("`" + players.strings.nation + "`")
-                            .setFooter(commandString)
-                            .setAuthor(this.entity.user);
-                        embed.addFields({ name: 'Name', value: players.name, inline: true }, { name: 'Surname', value: players.surname, inline: true }, { name: 'Balance', value: players.balance, inline: true }, { name: 'Nation', value: players.nation, inline: true }, { name: 'Town', value: players.town, inline: true }, { name: 'Nation rank', value: players.nationrank, inline: true }, { name: 'Town rank', value: players.townrank, inline: true });
-                        return [4 /*yield*/, this.Send.sendUserEmbed(embed)];
+                        return [4 /*yield*/, earthmc_1.OfficialAPI.resident(player)];
                     case 1:
-                        _a.sent();
-                        return [3 /*break*/, 4];
+                        players = _a.sent();
+                        embed = new discord_js_1.EmbedBuilder()
+                            .setAuthor(this.entity.user.displayName.toString)
+                            .setDescription(commandString)
+                            .setColor('DarkGreen')
+                            .setTitle("info for " + player + " player")
+                            .addFields({ name: 'Name', value: player, inline: true }, { name: "Balance", value: String(players.balance), inline: true }, { name: 'Town', value: String(players.town), inline: true }, { name: 'Nation', value: String(players.nation), inline: true }, { name: 'Town Rank', value: String(players.townRanks), inline: true }, { name: 'Nation Rank', value: String(players.nationRanks), inline: true });
+                        return [4 /*yield*/, this.send.sendUsersend(embed)];
                     case 2:
-                        e_2 = _a.sent();
-                        return [4 /*yield*/, this.Send.sendErrorEmbed(e_2)];
-                    case 3:
                         _a.sent();
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
+                        return [3 /*break*/, 5];
+                    case 3:
+                        e_2 = _a.sent();
+                        return [4 /*yield*/, this.send.sendErrorsend(e_2)];
+                    case 4:
+                        _a.sent();
+                        return [3 /*break*/, 5];
+                    case 5: return [2 /*return*/];
                 }
             });
         });
     };
     playercommand.prototype.friendlist = function (player) {
-        if (player === void 0) { player = 'random'; }
         return __awaiter(this, void 0, void 0, function () {
-            var server, commandString, allPlayerLookup, playersLookup, embed, e_3;
+            var server, commandString, playersLookup, embed, e_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 4]);
+                        _a.trys.push([0, 3, , 5]);
                         server = 'aurora';
                         commandString = "/player friendlist player: " + player + " server: " + server;
                         if (!this.entity.user) {
                             throw new Error("User is null or undefined.");
                         }
-                        if (player.toLowerCase() === "random") {
-                            allPlayerLookup = earthmc_1.OfficialApi.players.all;
-                            player = String(CommandTools_1.CommandTools.random_choice(allPlayerLookup.allPlayers));
-                        }
-                        playersLookup = earthmc_1.OfficialApi.player(player);
-                        embed = new discord_js_1.MessageEmbed()
-                            .setTitle("`" + playersLookup.strings.nation + "`")
-                            .setFooter(commandString)
-                            .setAuthor(this.entity.user);
-                        embed.addFields({ name: 'Name', value: playersLookup.name, inline: true }, { name: 'Surname', value: playersLookup.surname, inline: true }, { name: 'Friends', value: playersLookup.friendlist, inline: true });
-                        return [4 /*yield*/, this.Send.sendUserEmbed(embed)];
+                        return [4 /*yield*/, earthmc_1.OfficialAPI.resident(player)];
                     case 1:
-                        _a.sent();
-                        return [3 /*break*/, 4];
+                        playersLookup = _a.sent();
+                        embed = new discord_js_1.EmbedBuilder()
+                            .setAuthor(this.entity.user.displayName.toString)
+                            .setDescription(commandString)
+                            .setColor('DarkGreen')
+                            .setTitle("info for " + player + " player")
+                            .addFields({ name: 'Name', value: player, inline: true }, { name: "Friends", value: String(playersLookup.friends), inline: true });
+                        return [4 /*yield*/, this.send.sendUsersend(embed)];
                     case 2:
-                        e_3 = _a.sent();
-                        return [4 /*yield*/, this.Send.sendErrorEmbed(e_3)];
-                    case 3:
                         _a.sent();
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
+                        return [3 /*break*/, 5];
+                    case 3:
+                        e_3 = _a.sent();
+                        return [4 /*yield*/, this.send.sendErrorsend(e_3)];
+                    case 4:
+                        _a.sent();
+                        return [3 /*break*/, 5];
+                    case 5: return [2 /*return*/];
                 }
             });
         });
     };
-    playercommand.prototype.rank = function (player, object) {
-        if (player === void 0) { player = 'random'; }
-        if (object === void 0) { object = ''; }
+    playercommand.prototype.rank = function (player) {
         return __awaiter(this, void 0, void 0, function () {
-            var server, commandString, allPlayerLookup, players, rank, rank, embed, e_4;
+            var server, commandString, players, embed, e_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 4]);
+                        _a.trys.push([0, 3, , 5]);
                         server = 'aurora';
-                        commandString = "/player rank " + object + " ";
+                        commandString = "/player rank " + player + " ";
                         if (!this.entity.user) {
                             throw new Error("User is null or undefined.");
                         }
-                        if (player.toLowerCase() === 'random') {
-                            allPlayerLookup = earthmc_1.OfficialApi.players.all;
-                            player = String(CommandTools_1.CommandTools.random_choice(allPlayerLookup.allPlayers));
-                        }
-                        players = earthmc_1.OfficialApi.player(player);
-                        if (object === 'Town') {
-                            rank = players.town.rank;
-                        }
-                        else if (object === 'Nation') {
-                            rank = players.nation.rank;
-                        }
-                        embed = new discord_js_1.MessageEmbed()
-                            .setTitle("`" + players.strings.nation + "`")
-                            .setFooter(commandString)
-                            .setAuthor(this.entity.user);
-                        embed.addFields({ name: 'Name', value: players.name, inline: true }, { name: 'Surname', value: players.surname, inline: true }, { name: "Rank town or nation ", value: this.rank, inline: true });
-                        return [4 /*yield*/, this.Send.sendUserEmbed(embed)];
+                        return [4 /*yield*/, earthmc_1.OfficialAPI.resident(player)];
                     case 1:
-                        _a.sent();
-                        return [3 /*break*/, 4];
+                        players = _a.sent();
+                        embed = new discord_js_1.EmbedBuilder()
+                            .setAuthor(this.entity.user.displayName.toString)
+                            .setDescription(commandString)
+                            .setColor('DarkGreen')
+                            .setTitle("info for " + player + " player")
+                            .addFields({ name: 'Name', value: player, inline: true }, { name: "Town Rank", value: String(players.townRanks), inline: true }, { name: "Nation Rank", value: String(players.nationRanks), inline: true });
+                        return [4 /*yield*/, this.send.sendUsersend(embed)];
                     case 2:
-                        e_4 = _a.sent();
-                        return [4 /*yield*/, this.Send.sendErrorEmbed(e_4)];
-                    case 3:
                         _a.sent();
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
+                        return [3 /*break*/, 5];
+                    case 3:
+                        e_4 = _a.sent();
+                        return [4 /*yield*/, this.send.sendErrorsend(e_4)];
+                    case 4:
+                        _a.sent();
+                        return [3 /*break*/, 5];
+                    case 5: return [2 /*return*/];
                 }
             });
         });

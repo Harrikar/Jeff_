@@ -32,8 +32,39 @@ class CommandTools {
     let randomoutput: string = list[randomIndex];
   }
 
+  static splitOnChanges(inputList: string[]): string[][] {
+    const result: string[][] = [];
+    let currentSublist: string[] = [];
 
+    for (let i = 0; i < inputList.length; i++) {
+        const currentValue = inputList[i];
+
+        if (i === 0 || currentValue !== inputList[i - 1]) {
+            // Start a new sublist when the value changes
+            if (currentSublist.length > 0) {
+                result.push([...currentSublist]);
+                currentSublist = [];
+            }
+        }
+
+        currentSublist.push(currentValue);
+    }
+
+    if (currentSublist.length > 0) {
+        result.push([...currentSublist]);
+    }
+
+    return result;
 }
+static varnew(inputList: string[][]) {
+  const arrayOfVars: string[][] = [];
+  for (const sublist of inputList) {
+      arrayOfVars.push(sublist);
+  }
+  return arrayOfVars;
+}
+}
+
 
 export 
   {CommandTools}

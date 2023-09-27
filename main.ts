@@ -1,28 +1,47 @@
-import {Nations} from './src/Nations';
+import * as discord from 'discord.js';
+import { Nations } from './src/Nations';
 import { playercommand } from './src/Players';
-import {TownCommand} from './src/Towns';
-import * as Discord from 'discord.js';
-import * as dotenv from 'dotenv'
-import {send} from './src/utils/sends';
-import { Weather } from './src/weather';
-import { Level } from './src/levels';
+import { TownCommand } from './src/Towns';
+import { Send } from './src/utils/send';
+import { Devcommands } from './src/devcommands';
+import { SapphireClient } from '@sapphire/framework';
 
-const client = new Discord.Client();
-const Send = new send(client);
-const nationCommand = new Nations(client,Send);
-const townCommand = new TownCommand(client,Send);
-const playerCommand = new playercommand(client,Send);
-const weathercommand = new Weather(client,Send)
-const level = new Level(client,Send)
-dotenv.config();
+const client = new SapphireClient({
+    intents: [
+        discord.GatewayIntentBits.Guilds,
+        discord.GatewayIntentBits.GuildMessages,
+    ],
+    allowedMentions: {
+        parse: ['users', 'roles'],
+        repliedUser: true,
+    },    
 
+    presence: {
+        activities: [
+            {
+                name: 'Watching Jefferson',
+                
+            }
+        ],
+        status: 'online'
+    }
+});
+
+const send = new Send(client);
+const nationCommand = new Nations(client, send);
+const townCommand = new TownCommand(client, send);
+const playerCommand = new playercommand(client, send);
+const dev = new Devcommands(client, send);
 
 client.on('message', async (message) => {
-    if (message.author.bot) return;
-
-    const args = message.content.split(' ');
+    if (client.user?.bot){
+        send.sendUserMessage('sorry i dont accept commands from bots ')
+    }
+    
+    const args = client.on.arguments.slice('')
     const command = args.shift()?.toLowerCase();
-    // check which command was run
+
+    // Check which command was run
     if (command === '/nation') {
         const subCommand = args[0]?.toLowerCase();
 
@@ -59,28 +78,37 @@ client.on('message', async (message) => {
         } else if (subCommand === 'friendlist') {
             await playerCommand.friendlist(args[1]);
         } else if (subCommand === 'rank') {
-            await playerCommand.rank(args[1], args[2]);
+            await playerCommand.rank(args[1]);
         }
-    }
-    else if (command === '/weather'){
+    } 
+     //else if (command === '/levels') {
+        //const subCommand = args[0]?.toLowerCase();
+       // if (subCommand === 'show') {
+            //await level.showlevel(args[1]);
+        //}
+        //TODO : Fix levels
+ 
+    else if (command === '/dev'){
         const subCommand = args[0]?.toLowerCase();
-        if (subCommand === '/weather search'){
-            await weathercommand.search(args[1])
+        if (subCommand === 'restart'){
+            await dev.restart()
+        } else if (subCommand === 'stop'){
+            await dev.stop()
         }
-    }
-    else if (command === '/levels show'){
-        await level.showlevel(args[1])
     }
 });
 
-try{
-    
-    const token = process.env.TOKEN
+try {
+    const token = 'MTEyMTc1MTQwMDI5NzI3OTU0OQ.GDw6hv.Zzu0SdPCYrJKJARPg60oEzB71Gyqqe-9WEeHHQ';
     client.login(token);
+    console.log('Login sucessful')
+} catch (e) {
+    throw new Error;
 }
-catch (e){
-    throw new console.error(`Error ${e}`);
-    
-}
+
+
+
+
+
 
 

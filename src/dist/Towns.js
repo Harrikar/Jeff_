@@ -37,13 +37,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.TownCommand = void 0;
-var discord_js_1 = require("discord.js");
 var CommandTools_1 = require("./utils/CommandTools");
 var earthmc_1 = require("earthmc");
+var discord_js_1 = require("discord.js");
 var TownCommand = /** @class */ (function () {
-    function TownCommand(entity, Send) {
+    function TownCommand(entity, send) {
         this.entity = entity;
-        this.Send = Send;
+        this.send = send;
     }
     TownCommand.prototype.town = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -55,13 +55,13 @@ var TownCommand = /** @class */ (function () {
                         if (!this.entity.user) {
                             throw new Error("User is null or undefined.");
                         }
-                        return [4 /*yield*/, this.Send.sendUserMessage('This is the main /town command. ')];
+                        return [4 /*yield*/, this.send.sendUserMessage('This is the main /town command. ')];
                     case 1:
                         _a.sent();
                         return [3 /*break*/, 4];
                     case 2:
                         e_1 = _a.sent();
-                        return [4 /*yield*/, this.Send.sendErrorEmbed(e_1)];
+                        return [4 /*yield*/, this.send.sendErrorsend(e_1)];
                     case 3:
                         _a.sent();
                         return [3 /*break*/, 4];
@@ -74,77 +74,91 @@ var TownCommand = /** @class */ (function () {
         if (town === void 0) { town = "random"; }
         if (server === void 0) { server = "aurora"; }
         return __awaiter(this, void 0, void 0, function () {
-            var commandString, allTownsLookup, towns, Mayor, embed, chunks_worth, town_spawn_x, town_spawn_z, town_spawn, e_2;
+            var commandString, townlookup, locationUrl, fields, e_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 4]);
+                        _a.trys.push([0, 3, , 5]);
                         commandString = "/town search town: " + town + " server: " + server;
                         if (!this.entity.user) {
                             throw new Error("User is null or undefined.");
                         }
-                        if (town.toLowerCase() === "random") {
-                            allTownsLookup = earthmc_1.OfficialApi.towns.all;
-                            town = String(CommandTools_1.CommandTools.random_choice(allTownsLookup.allTowns));
-                        }
-                        towns = earthmc_1.OfficialApi.town(town);
-                        Mayor = earthmc_1.OfficialApi.townsLookup.Mayor;
-                        embed = new discord_js_1.MessageEmbed()
-                            .setTitle("`" + towns.strings.nation + "`")
-                            .setDescription(towns.strings.board)
-                            .setFooter(commandString)
-                            .setAuthor(this.entity.user);
-                        chunks_worth = towns.Chunks.worth();
-                        town_spawn_x = towns.spawn.x;
-                        town_spawn_z = towns.spawn.z;
-                        town_spawn = town_spawn_x + ',' + town_spawn_z;
-                        embed.addFields({ name: 'Name', value: towns.name, inline: true }, { name: "Mayor", value: Mayor, inline: true }, { name: 'Nation', value: towns.nation, inline: true }, { name: 'Balance', value: towns.balance, inline: true }, { name: " Chunks (worth " + chunks_worth + ")", value: towns.Chunks, inline: true }, { name: ' Resident', value: towns.numResidents, inline: true }, { name: "Spawn", value: towns.town_spawn, inline: true });
-                        return [4 /*yield*/, this.Send.sendUserEmbed(embed)];
+                        return [4 /*yield*/, earthmc_1.OfficialAPI.town(town)];
                     case 1:
-                        _a.sent();
-                        return [3 /*break*/, 4];
+                        townlookup = _a.sent();
+                        locationUrl = "https://earthmc.net/map/" + server + "/?zoom=4&x=" + townlookup.spawn.x + "&z=" + townlookup.spawn.z;
+                        fields = [
+                            { name: 'Name', value: town, inline: true },
+                            { name: 'Residents', value: townlookup.residents.toString(), inline: true },
+                            { name: "chunks", value: townlookup.chunks.toString(), inline: true },
+                            { name: 'worth', value: Number(townlookup.chunks * 16), inline: true },
+                            { name: 'Nation', value: townlookup.nation, inline: true },
+                            { name: 'Mayor', value: townlookup.Mayor, inline: true },
+                            { name: 'Capital', value: townlookup.Capital, inline: true },
+                            { name: "Location", value: "[" + Math.round(townlookup.spawn.x) + ", " + Math.round(townlookup.spawn.z) + "](" + locationUrl + ")", inline: true },
+                            { name: "Quoried by " + this.entity.user.username, inline: true },
+                            { name: 'bot desinged and coded by charis_k', inline: true }
+                        ];
+                        return [4 /*yield*/, this.send.sendUsersend(fields)];
                     case 2:
-                        e_2 = _a.sent();
-                        return [4 /*yield*/, this.Send.sendErrorEmbed(e_2)];
-                    case 3:
                         _a.sent();
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
+                        return [3 /*break*/, 5];
+                    case 3:
+                        e_2 = _a.sent();
+                        return [4 /*yield*/, this.send.sendErrorsend(e_2)];
+                    case 4:
+                        _a.sent();
+                        return [3 /*break*/, 5];
+                    case 5: return [2 /*return*/];
                 }
             });
         });
     };
-    TownCommand.prototype.ranklist = function (town, server) {
-        if (server === void 0) { server = "aurora"; }
+    TownCommand.prototype.ranklist = function (town) {
+        var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var commandString, townsLookup, embed, rank, rankString, e_3;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var commandString, townsLookup, _b, _c, _i, rank, rankString, embed, e_3;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 4]);
-                        commandString = "/nation ranklist town: " + town + " server: " + server;
-                        townsLookup = earthmc_1.OfficialApi.town(town);
-                        embed = new discord_js_1.MessageEmbed()
-                            .setTitle("`" + townsLookup.rank + "'s Ranked Residents`")
-                            .setFooter(commandString)
-                            .setAuthor(this.entity.user);
-                        for (rank in townsLookup.ranks) {
-                            if (townsLookup.ranks.hasOwnProperty(rank)) {
-                                rankString = CommandTools_1.CommandTools.listToString(townsLookup.ranks[rank]);
-                                embed.addField(rank.charAt(0).toUpperCase() + rank.slice(1), "```" + rankString.slice(0, 1022) + "```", true);
-                            }
-                        }
-                        return [4 /*yield*/, this.Send.sendUserEmbed(embed)];
+                        _d.trys.push([0, 6, , 8]);
+                        commandString = "/nation ranklist town: " + town + " ";
+                        return [4 /*yield*/, earthmc_1.OfficialAPI.town(town)];
                     case 1:
-                        _a.sent();
-                        return [3 /*break*/, 4];
+                        townsLookup = _d.sent();
+                        _b = [];
+                        for (_c in townsLookup.ranks)
+                            _b.push(_c);
+                        _i = 0;
+                        _d.label = 2;
                     case 2:
-                        e_3 = _a.sent();
-                        return [4 /*yield*/, this.Send.sendErrorEmbed(e_3)];
+                        if (!(_i < _b.length)) return [3 /*break*/, 5];
+                        rank = _b[_i];
+                        if (!townsLookup.ranks.hasOwnProperty(rank)) return [3 /*break*/, 4];
+                        rankString = CommandTools_1.CommandTools.listToString(townsLookup.ranks[rank]);
+                        embed = new discord_js_1.EmbedBuilder();
+                        if (this.entity.user) {
+                            embed.setAuthor(this.entity.user.username.toString);
+                        }
+                        embed.setColor('DarkGreen');
+                        embed.setDescription(commandString)
+                            .setImage(String((_a = this.entity.user) === null || _a === void 0 ? void 0 : _a.avatarURL));
+                        embed.addFields({ name: 'Ranklist', value: rankString, inline: true });
+                        return [4 /*yield*/, this.send.sendUsersend(embed)];
                     case 3:
-                        _a.sent();
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
+                        _d.sent();
+                        _d.label = 4;
+                    case 4:
+                        _i++;
+                        return [3 /*break*/, 2];
+                    case 5: return [3 /*break*/, 8];
+                    case 6:
+                        e_3 = _d.sent();
+                        return [4 /*yield*/, this.send.sendErrorsend(e_3)];
+                    case 7:
+                        _d.sent();
+                        return [3 /*break*/, 8];
+                    case 8: return [2 /*return*/];
                 }
             });
         });
