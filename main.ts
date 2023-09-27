@@ -99,7 +99,7 @@ client.on('message', async (message) => {
 });
 
 try {
-    const token = 'MTEyMTc1MTQwMDI5NzI3OTU0OQ.GDw6hv.Zzu0SdPCYrJKJARPg60oEzB71Gyqqe-9WEeHHQ';
+    const token = '';
     client.login(token);
     console.log('Login sucessful')
 } catch (e) {
