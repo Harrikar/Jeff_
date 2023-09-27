@@ -1,15 +1,15 @@
 import { Client } from 'discord.js';
 import { CommandTools } from "./utils/CommandTools";
-import { OfficialApi } from 'earthmc';
-import { send } from './utils/send';
-
+import { OfficialAPI } from 'earthmc';
+import { Send } from './utils/send';
+import {EmbedBuilder} from 'discord.js'
 class TownCommand {
     private entity: Client;
-    private Send: send;
+    private send: Send;
 
-    constructor(entity: Client, Send: send) {
+    constructor(entity: Client, send: Send) {
         this.entity = entity;
-        this.Send = Send;
+        this.send = send;
     }
 
     async town() {
@@ -18,10 +18,10 @@ class TownCommand {
                 throw new Error("User is null or undefined.");
             }
 
-            await this.Send.sendUserMessage('This is the main /town command. ');
+            await this.send.sendUserMessage('This is the main /town command. ');
 
         } catch (e) {
-            await this.Send.sendErrorEmbed(e);
+            await this.send.sendErrorsend(e);
         }
     }
 
@@ -33,7 +33,7 @@ class TownCommand {
                 throw new Error("User is null or undefined.");
             }
 
-            const townlookup = OfficialApi.town(town)
+            const townlookup = await OfficialAPI.town(town)
             const locationUrl = `https://earthmc.net/map/${server}/?zoom=4&x=${townlookup.spawn.x}&z=${townlookup.spawn.z}`;
 
             const fields = [
@@ -50,33 +50,39 @@ class TownCommand {
 
             ]
 
-            await this.Send.sendUserEmbed(fields);
+            await this.send.sendUsersend(fields);
 
         } catch (e) {
-            await this.Send.sendErrorEmbed(e);
+            await this.send.sendErrorsend(e);
         }
     }
 
-    async ranklist(town: string, server: string = "aurora") {
+    async ranklist(town: string) {
         try {
-            const commandString = `/nation ranklist town: ${town} server: ${server}`;
+            const commandString = `/nation ranklist town: ${town} `;
 
-            const townsLookup = OfficialApi.town(town);
+            const townsLookup = await OfficialAPI.town(town);
 
-            let embedString = `**${townsLookup.rank}'s Ranked Residents**\n`;
 
             for (const rank in townsLookup.ranks) {
                 if (townsLookup.ranks.hasOwnProperty(rank)) {
                     const rankString = CommandTools.listToString(townsLookup.ranks[rank]);
-
-                    embedString += `${rank.charAt(0).toUpperCase() + rank.slice(1)}:\n\`\`\`${rankString.slice(0, 1022)}\`\`\`\n`;
+                    const embed = new EmbedBuilder()
+                        if (this.entity.user){
+                            embed.setAuthor(this.entity.user.username.toString)
+                        }
+                        embed.setColor('DarkGreen')
+                        embed.setDescription(commandString)
+                        .setImage(String(this.entity.user?.avatarURL))
+                        embed.addFields(
+                            {name:'Ranklist',value:rankString,inline:true}
+                        )
+                        await this.send.sendUsersend(embed);
                 }
             }
 
-            await this.Send.sendUserMessage(embedString);
-
         } catch (e) {
-            await this.Send.sendErrorEmbed(e);
+            await this.send.sendErrorsend(e);
         }
     }
 }

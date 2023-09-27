@@ -1,5 +1,5 @@
 import { Client, Message } from 'discord.js';
-import { send } from './utils/send';
+import { Send } from './utils/send';
 import * as admin from 'firebase-admin';
 const serviceAccount = require("./jeff-db-firebase-adminsdk-qekso-80d55b4f4c.json");
 
@@ -13,10 +13,10 @@ const db = admin.firestore()
 
 class Level {
   private entity: Client;
-  private Send: send
-  constructor(entity: Client,Send:send) {
+  private send: Send
+  constructor(entity: Client,send:Send) {
     this.entity = entity;
-    this.Send = Send;
+    this.send = send;
   }
 
   async level() {
@@ -74,7 +74,7 @@ class Level {
         }
         
       } catch (error) {
-        this.Send.sendErrorEmbed(error);
+        this.send.sendErrorsend(error);
       }
     });
   }
@@ -95,15 +95,15 @@ class Level {
           const commandString = `Level of ${username}`;
           const response = `User level: ${userData.level} (XP: ${userData.xp})`;
 
-          await this.Send.sendUserMessage(response);
+          await this.send.sendUserMessage(response);
         } else {
-          await this.Send.sendUserMessage('User data not found.');
+          await this.send.sendUserMessage('User data not found.');
         }
       } else {
-        await this.Send.sendUserMessage('User isn\'t registered or you have an invalid or old username.');
+        await this.send.sendUserMessage('User isn\'t registered or you have an invalid or old username.');
       }
     } catch (error) {
-      this.Send.sendErrorEmbed(error);
+      this.send.sendErrorsend(error);
     }
   }
   async onUserUpdate(oldUser, newUser) {

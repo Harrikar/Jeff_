@@ -1,4 +1,4 @@
-import { send } from './utils/send';
+import { Send } from './utils/send';
 import { Client, Message } from 'discord.js';
 import { Aurora } from 'earthmc';
 import { CommandTools } from './utils/CommandTools';
@@ -6,19 +6,19 @@ import {OfficialApi} from 'earthmc';
 
 class Alliance {
     private entity: Client;
-    private Send: send;
+    private send: Send;
 
-    constructor(entity: Client, Send: send) {
+    constructor(entity: Client, send: Send) {
         this.entity = entity;
-        this.Send = Send;
+        this.send = send;
     }
 
     async a() {
         this.entity.on('message', async (message: Message) => {
             try {
-                this.Send.sendUserMessage("this is the main /a command for alliance info use /a info");
+                this.send.sendUserMessage("this is the main /a command for alliance info use /a info");
             } catch (e) {
-                this.Send.sendUserEmbed(e);
+                this.send.sendUsersend(e);
             }
         });
     }
@@ -38,7 +38,7 @@ class Alliance {
                         const nation = await OfficialApi.nation(nationName);
                         totalBalance += nation.balance;
                     } catch (error) {
-                        this.Send.sendErrorEmbed(error)
+                        this.send.sendErrorsend(error)
                     }
                 }
 
@@ -51,10 +51,10 @@ class Alliance {
                     { name:'Residents',value:alliance.residents,inline:true}
 
                 ];
-                this.Send.sendUserEmbed(fields)
+                this.send.sendUsersend(fields)
 
             } catch (e) {
-                this.Send.sendErrorEmbed(e)
+                this.send.sendErrorsend(e)
             }
         });
     }

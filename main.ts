@@ -2,13 +2,11 @@ import * as discord from 'discord.js';
 import { Nations } from './src/Nations';
 import { playercommand } from './src/Players';
 import { TownCommand } from './src/Towns';
-import { send } from './src/utils/send';
-import { Level } from './src/levels';
-import { Alliance } from './src/alliance';
+import { Send } from './src/utils/send';
 import { Devcommands } from './src/devcommands';
-// Set up the client with specified options
+import { SapphireClient } from '@sapphire/framework';
 
-const client = new discord.Client({
+const client = new SapphireClient({
     intents: [
         discord.GatewayIntentBits.Guilds,
         discord.GatewayIntentBits.GuildMessages,
@@ -17,35 +15,30 @@ const client = new discord.Client({
         parse: ['users', 'roles'],
         repliedUser: true,
     },    
+
     presence: {
         activities: [
             {
                 name: 'Watching Jefferson',
+                
             }
         ],
         status: 'online'
     }
 });
 
-
-
-
-
-const Send = new send(client);
-const nationCommand = new Nations(client, Send);
-const townCommand = new TownCommand(client, Send);
-const playerCommand = new playercommand(client, Send);
-
-const level = new Level(client, Send);
-const alliance = new Alliance(client, Send);
-const dev = new Devcommands(client, Send);
+const send = new Send(client);
+const nationCommand = new Nations(client, send);
+const townCommand = new TownCommand(client, send);
+const playerCommand = new playercommand(client, send);
+const dev = new Devcommands(client, send);
 
 client.on('message', async (message) => {
-    if (message.author.bot){
-        Send.sendUserMessage('stop spamming me you stupid #####')
+    if (client.user?.bot){
+        send.sendUserMessage('sorry i dont accept commands from bots ')
     }
-
-    const args = message.content.split(' ');
+    
+    const args = client.on.arguments.slice('')
     const command = args.shift()?.toLowerCase();
 
     // Check which command was run
@@ -85,20 +78,17 @@ client.on('message', async (message) => {
         } else if (subCommand === 'friendlist') {
             await playerCommand.friendlist(args[1]);
         } else if (subCommand === 'rank') {
-            await playerCommand.rank(args[1], args[2]);
+            await playerCommand.rank(args[1]);
         }
     } 
-     else if (command === '/levels') {
-        const subCommand = args[0]?.toLowerCase();
-        if (subCommand === 'show') {
-            await level.showlevel(args[1]);
-        }
-    } else if (command === '/a') {
-        const subCommand = args[0]?.toLowerCase();
-        if (subCommand === 'info'){
-            await alliance.info(args[1])
-        }
-    } else if (command === '/dev'){
+     //else if (command === '/levels') {
+        //const subCommand = args[0]?.toLowerCase();
+       // if (subCommand === 'show') {
+            //await level.showlevel(args[1]);
+        //}
+        //TODO : Fix levels
+ 
+    else if (command === '/dev'){
         const subCommand = args[0]?.toLowerCase();
         if (subCommand === 'restart'){
             await dev.restart()
@@ -111,6 +101,7 @@ client.on('message', async (message) => {
 try {
     const token = 'MTEyMTc1MTQwMDI5NzI3OTU0OQ.GDw6hv.Zzu0SdPCYrJKJARPg60oEzB71Gyqqe-9WEeHHQ';
     client.login(token);
+    console.log('Login sucessful')
 } catch (e) {
     throw new Error;
 }

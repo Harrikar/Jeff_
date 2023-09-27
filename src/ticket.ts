@@ -1,24 +1,26 @@
 import { Client } from 'discord.js';
-import {send} from './utils/send';
+import {Send} from './utils/send';
 
 class Ticket{
     private entity: Client;
-    private Send: send;
+    private send: Send;
 
-    constructor(entity: Client, Send: send) {
+    constructor(entity: Client, send: Send) {
         this.entity = entity;
-        this.Send = Send;
+        this.send = send;
     }
     async ticket(){
         try{
-            this.Send.sendUserMessage('this is the main ticket command use the /ticket open to open a ticket')
+            this.send.sendUserMessage('this is the main ticket command use the /ticket open to open a ticket')
         }catch(e){
-            this.Send.sendUserMessage(`Unexpected error ${e}`)
+            this.send.sendUserMessage(`Unexpected error ${e}`)
         }
     }
+
     async open(){
         this.entity.on('message', async (message) => {
             try{
+                
                 const guild = message.guild;
 
                 const channel = await guild.channels.create('new-channel', {
@@ -27,11 +29,11 @@ class Ticket{
                     topic: '',
                     reason: `ticket channel for ${message.author}`
                 });
-               const ticketer = message.author;
+                const ticketer = message.author;
                 channel.send(`${message.author} list the reason for opening your ticket and an admin will be here to help you`)
     
             }catch(e){
-                this.Send.sendErrorEmbed(e)
+                this.send.sendErrorsend(e)
             }
         })
     }
@@ -56,7 +58,7 @@ class Ticket{
                     
                 }
             }catch(e){
-                this.Send.sendErrorEmbed(e)
+                this.send.sendErrorsend(e)
             }
         })
 
@@ -84,7 +86,7 @@ class Ticket{
                 }
                 ticketer.send(`your ticket was close by ${message.author}`)
             }catch(e){
-                this.Send.sendErrorEmbed(e)
+                this.send.sendErrorsend(e)
             }
         })
     }

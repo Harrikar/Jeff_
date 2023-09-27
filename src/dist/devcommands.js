@@ -39,48 +39,44 @@ exports.__esModule = true;
 exports.Devcommands = void 0;
 var pm2 = require("pm2");
 var Devcommands = /** @class */ (function () {
-    function Devcommands(entity, Send) {
+    function Devcommands(entity, send) {
         this.entity = entity;
-        this.Send = Send;
-        pm2.connect(function (err) {
-            if (err) {
-                console.error(err);
-                process.exit(2);
-            }
-        });
+        this.send = send;
     }
     Devcommands.prototype.restart = function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
                 this.entity.on('message', function (message) { return __awaiter(_this, void 0, void 0, function () {
-                    var guildId, guild, user, roleId, member, e_1;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
+                    var guildId, guild, user, roleId, user_id, member, e_1;
+                    var _a;
+                    return __generator(this, function (_b) {
+                        switch (_b.label) {
                             case 0:
-                                _a.trys.push([0, 4, , 5]);
+                                _b.trys.push([0, 4, , 5]);
                                 guildId = '1131117400985706538';
                                 guild = this.entity.guilds.cache.get(guildId);
                                 if (!guild) {
                                     return [2 /*return*/];
                                 }
-                                user = message.author;
+                                user = (_a = this.entity) === null || _a === void 0 ? void 0 : _a.user;
                                 roleId = '1131896754070093954';
-                                member = guild.members.cache.get(user.id);
+                                if (!user) return [3 /*break*/, 3];
+                                user_id = user.id;
+                                member = guild.members.cache.get(user_id);
                                 if (!(member && member.roles.cache.has(roleId))) return [3 /*break*/, 2];
-                                return [4 /*yield*/, this.Send.sendUserMessage('restarting')];
+                                return [4 /*yield*/, this.send.sendUserMessage('restarting')];
                             case 1:
-                                _a.sent();
+                                _b.sent();
                                 pm2.restart;
                                 return [3 /*break*/, 3];
                             case 2:
-                                new Error;
-                                _a.label = 3;
+                                this.send.sendUserMessage('this command is for devs only');
+                                _b.label = 3;
                             case 3: return [3 /*break*/, 5];
                             case 4:
-                                e_1 = _a.sent();
-                                this.Send.sendUserMessage('this command is for devs only');
-                                return [3 /*break*/, 5];
+                                e_1 = _b.sent();
+                                throw new Error;
                             case 5: return [2 /*return*/];
                         }
                     });
@@ -95,32 +91,33 @@ var Devcommands = /** @class */ (function () {
             return __generator(this, function (_a) {
                 this.entity.on('message', function (message) { return __awaiter(_this, void 0, void 0, function () {
                     var guildId, guild, user, roleId, member, e_2;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
+                    var _a;
+                    return __generator(this, function (_b) {
+                        switch (_b.label) {
                             case 0:
-                                _a.trys.push([0, 4, , 5]);
+                                _b.trys.push([0, 4, , 5]);
                                 guildId = '1131117400985706538';
                                 guild = this.entity.guilds.cache.get(guildId);
                                 if (!guild) {
                                     return [2 /*return*/];
                                 }
-                                user = message.author;
+                                user = (_a = this.entity) === null || _a === void 0 ? void 0 : _a.user;
                                 roleId = '1131896754070093954';
+                                if (!user) return [3 /*break*/, 3];
                                 member = guild.members.cache.get(user.id);
                                 if (!(member && member.roles.cache.has(roleId))) return [3 /*break*/, 2];
-                                return [4 /*yield*/, this.Send.sendUserMessage('stoping')];
+                                return [4 /*yield*/, this.send.sendUserMessage('stoping')];
                             case 1:
-                                _a.sent();
+                                _b.sent();
                                 pm2.stop;
                                 return [3 /*break*/, 3];
                             case 2:
-                                new Error;
-                                _a.label = 3;
+                                this.send.sendUserMessage('this command is for devs only');
+                                _b.label = 3;
                             case 3: return [3 /*break*/, 5];
                             case 4:
-                                e_2 = _a.sent();
-                                this.Send.sendUserMessage('this command is for devs only');
-                                return [3 /*break*/, 5];
+                                e_2 = _b.sent();
+                                throw new Error;
                             case 5: return [2 /*return*/];
                         }
                     });

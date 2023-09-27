@@ -1,22 +1,15 @@
 import { Client } from "discord.js";
-import { send } from "./utils/send";
+import { Send } from "./utils/send";
 import * as pm2 from 'pm2'; 
 
 class Devcommands {
     private entity: Client;
-    private Send: send;
+    private send: Send;
 
-    constructor(entity: Client, Send: send) {
+    constructor(entity: Client, send: Send) {
         this.entity = entity;
-        this.Send = Send;
+        this.send = send;
 
-        pm2.connect(function (err) {
-            if (err) {
-                console.error(err);
-                process.exit(2);
-                
-            }
-        });
     }
 
     async restart() {
@@ -29,19 +22,23 @@ class Devcommands {
                     return;
                 }
 
-                const user = message.author;
+                const user = this.entity?.user
                 const roleId = '1131896754070093954';
-                const member = guild.members.cache.get(user.id);
+                if (user){
+                    const user_id = user.id
+                    const member = guild.members.cache.get(user_id);
+                    if (member && member.roles.cache.has(roleId)) {
+                        await this.send.sendUserMessage('restarting')
+                        pm2.restart
+                    } else {
+                        this.send.sendUserMessage('this command is for devs only')
 
-                if (member && member.roles.cache.has(roleId)) {
-                    await this.Send.sendUserMessage('restarting')
-                    pm2.restart
-                } else {
-                    new Error
-                    
-                }
+                        }
+                    }
+                
             } catch (e) {
-                this.Send.sendUserMessage('this command is for devs only')
+                throw new Error
+                
             }
         });
     }
@@ -55,19 +52,21 @@ class Devcommands {
                     return;
                 }
 
-                const user = message.author;
+                const user = this.entity?.user
                 const roleId = '1131896754070093954';
-                const member = guild.members.cache.get(user.id);
+                if (user){
+                    const member = guild.members.cache.get(user.id);
 
-                if (member && member.roles.cache.has(roleId)) {
-                    await this.Send.sendUserMessage('stoping')
-                    pm2.stop
-                } else {
-                    new Error
-                    
+                    if (member && member.roles.cache.has(roleId)) {
+                        await this.send.sendUserMessage('stoping')
+                        pm2.stop
+                    } else {
+                        this.send.sendUserMessage('this command is for devs only')
+                        
+                    }
                 }
             } catch (e) {
-                this.Send.sendUserMessage('this command is for devs only')
+                throw new Error
             }
         });
     }

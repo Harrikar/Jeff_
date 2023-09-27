@@ -1,21 +1,21 @@
 import * as discord from 'discord.js'
-import { send } from './utils/send'
+import { Send } from './utils/send'
 
 
 class Join{
     private entity: discord.Client;
-    private Send: send;
+    private send: Send;
 
-    constructor(entity: discord.Client, Send: send) {
+    constructor(entity: discord.Client, send: Send) {
         this.entity = entity;
-        this.Send = Send;
+        this.send = send;
     }
     async join(){
         this.entity.on('guildMemberAdd', (member) => {
             const guild = member.guild;
             const channel =  guild.channels.cache.find(channel => channel.name === 'requests');
             if (channel){
-                this.Send.sendUserMessage(`${member} list your town and ign`)
+                this.send.sendUserMessage(`${member} list your town and ign`)
             }
 
             

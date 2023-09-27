@@ -1,17 +1,15 @@
-import { Client} from 'discord.js';
 import {CommandTools} from "./utils/CommandTools";
-import {send} from './utils/send';
-import {  Aurora } from 'earthmc';
-import {OfficialApi} from 'earthmc'; 
-
+import {Send} from './utils/send';
+import { OfficialAPI } from 'earthmc';
+import { EmbedBuilder,Embed ,Client, Options} from "discord.js";
 
 class Nations{
-   private entity: Client;
-   private Send: send
+   private entity: Client ;
+   private send: Send
 
-  constructor(entity: Client,Send:send) {
+  constructor(entity: Client,send:Send) {
     this.entity = entity;
-    this.Send = Send;
+    this.send = send;
   }
 
     async nation() {
@@ -20,55 +18,50 @@ class Nations{
                 throw new Error("User is null or undefined.");
             }
 
-            await this.Send.sendUserMessage('This is the main /nation command. Use subcommands like `/nation search`, `/nation reslist`, etc.');
+            await this.send.sendUserMessage('This is the main /nation command. Use subcommands like `/nation search`, `/nation reslist`, etc.');
 
         } catch (e) {
-            await this.Send.sendErrorEmbed(e);
+            await this.send.sendErrorsend(e);
         }
     }
 
-    async search(nation: string = "random", server: string = "aurora") {
+    async search(nation: string , server: string = "aurora") {
         try {
             const commandString = `/nation search nation: ${nation} server: ${server}`;
 
             if (!this.entity.user) {
                 throw new Error("User is null or undefined.");
             }
-
-            if (nation.toLowerCase() === "random") {
-                const allNationsLookup = OfficialApi.nations.all()
-                nation = String(CommandTools.random_choice(allNationsLookup.allNations));
-            }
             
 
-            const nations = OfficialApi.nation(nation);
-            const locationUrl = `https://earthmc.net/map/${server}/?zoom=4&x=${nations.spawn.x}&z=${nations.spawn.z}`;
 
+            const nations = await OfficialAPI.nation(nation)
+            
+            const locationUrl = `https://earthmc.net/map/${server}/?zoom=4&x=${nations.spawn.x}&z=${nations.spawn.z}`;
             
 
             const chunks_worth = nations.Chunks * 16;
-            const alliance = Aurora.alliance(nation);
 
-            const fields= [
-                {name:'',value:this.entity.user.avatarURL,inline:true},
-                { name: 'Name', value: nations.name, inline: true },
+
+            const embed = new EmbedBuilder()
+                .setAuthor(this.entity.user.displayName.toString)
+                .setDescription(commandString)
+                .setColor('DarkGreen')
+                .setTitle(`info for ${nation} nation`)
+            embed.addFields(
+                { name: 'Name', value: nation, inline: true },
                 { name: "King", value: nations.King, inline: true },
-                { name: "Capital", value: nations.Capital, inline: true },
-                { name: "Rank", value: nations.ranklist, inline: true },
+                { name: "Balance",value: nations.balance, inline: true},
+                { name:`Chunks ${chunks_worth}`,value:nations.Chunks,inline: true},
                 { name: "Location", value: `[${Math.round(nations.spawn.x)}, ${Math.round(nations.spawn.z)}](${locationUrl})`, inline: true },
-                { name: "Alliance", value: alliance, inline: true },
-                { name: "Residents", value: nations.stats.numResidents.toString(), inline: true },
-                { name: "Towns", value: nations.stats.numTowns.toString(), inline: true },
+                { name:'Towns',value:nations.Towns.toString(),inline:true}, 
+                { name:'Residents',value:nations.residents.toString(),inline:true},                   
+                )
                 
-                { name: `Chunks (${chunks_worth} worth of gold)`, value: nations.Chunks, inline: true },
-                {name:`Quoried by ${this.entity.user.username}`,inline:true},
-                {name:'bot desinged and coded by charis_k',inline:true}
-            ]
-
-            await this.Send.sendUserEmbed(fields);
+            await this.send.sendUsersend(embed);
 
         } catch (e) {
-            await this.Send.sendErrorEmbed(e);
+            await this.send.sendErrorsend(e);
         }
         
     }
@@ -77,18 +70,27 @@ class Nations{
         try {
             const commandString = `/nation reslist nation: ${nation} server: ${server}`;
 
-            const nations = OfficialApi.nation(nation);
-
-            
-
+            const nations = await OfficialAPI.nation(nation);
             const residentsString = CommandTools.listToString(nations.residents);
 
-            const fields = ["Residents", "```" + residentsString.slice(0, 1018) + "```", true]
+            if (!this.entity.user){
+                this.send.sendUserMessage('Not possible to identify user')
+            }
+            else{
+                const embed = new EmbedBuilder()
+                    .setAuthor(this.entity.user.displayName.toString)
+                    .setDescription(commandString)
+                    .setColor('DarkGreen')
+                    .setTitle(`info for ${nation} nation`)
+                    .addFields(
+                        { name:'Residents',value:residentsString,inline:true}
+                        )
+                await this.send.sendUsersend(embed);
 
-            await this.Send.sendUserEmbed(fields);
+            }
 
         } catch (e) {
-            await this.Send.sendErrorEmbed(e);
+            await this.send.sendErrorsend(e);
         }
     }
 
@@ -96,7 +98,7 @@ class Nations{
         try {
             const commandString = `/nation ranklist nation: ${nation} server: ${server}`;
 
-            const nations = OfficialApi.nation(nation);
+            const nations = await OfficialAPI.nation(nation);
 
             
 
@@ -105,14 +107,14 @@ class Nations{
                     const rankString = CommandTools.listToString(nations.ranks[rank]);
 
                     const fields = [rank.charAt(0).toUpperCase() + rank.slice(1), "```" + rankString.slice(0, 1022) + "```", true]
-                    await this.Send.sendUserEmbed(fields);
+                    await this.send.sendUsersend(fields);
                 }
             }
 
             
 
         } catch (e) {
-            await this.Send.sendErrorEmbed(e);
+            await this.send.sendErrorsend(e);
         }
     }
 
@@ -120,24 +122,44 @@ class Nations{
         try {
             const commandString = `/nation allylist nation: ${nation} server: ${server}`;
 
-            const nations = OfficialApi.nation(nation);
+            const nations = await OfficialAPI.nation(nation);
 
             
 
             if (nations.allies.length !== 0) {
                 const alliesString = CommandTools.listToString(nations.allies);
+                const embed = new EmbedBuilder()
+                if (this.entity.user){
+                    embed.setAuthor(this.entity.user.displayName.toString)}
+                
+                embed.setDescription(commandString)
+                embed.setColor('DarkGreen')
+                embed.setTitle(`info for ${nation} nation`)
+                embed.addFields(
+                    { name:'Allies',value:alliesString,inline:true}
+                    )
 
-                const fields = ["Allies", "```" + alliesString.slice(0, 1018) + "```", true]
-                await this.Send.sendUserEmbed(fields);
+            await this.send.sendUsersend(embed);
+                
             } else {
-                const fields = ["Allies", `${nations.allies} has no allies :)`, true]
-                await this.Send.sendUserEmbed(fields);
+                const embed = new EmbedBuilder()
+                    if (this.entity.user){
+                        embed.setAuthor(this.entity.user.displayName.toString)}
+                    
+                    embed.setDescription(commandString)
+                    embed.setColor('DarkGreen')
+                    embed.setTitle(`info for ${nation} nation`)
+                    embed.addFields(
+                        { name:'This nation has no allied nations :/',value:'',inline:true}
+                        )
+
+                await this.send.sendUsersend(embed);
             }
 
            
 
         } catch (e) {
-            await this.Send.sendErrorEmbed(e);
+            await this.send.sendErrorsend(e);
         }
     }
 
@@ -145,24 +167,24 @@ class Nations{
         try {
             const commandString = `/nation enemylist nation: ${nation} server: ${server}`;
 
-            const nations = OfficialApi.nation(nation);
+            const nations = await OfficialAPI.nation(nation);
 
             
             if (nations.enemies.length !== 0) {
                 const enemiesString = CommandTools.listToString(nations.enemies);
 
                 const fields = ["Enemies", "```" + enemiesString.slice(0, 1018) + "```", true];
-                await this.Send.sendUserEmbed(fields);
+                await this.send.sendUsersend(fields);
 
             } else {
                 const fields = ["Enemies", `${nations.enemies} has no enemies :)`, true];
-                await this.Send.sendUserEmbed(fields);
+                await this.send.sendUsersend(fields);
             }
 
             
 
         } catch (e) {
-            await this.Send.sendErrorEmbed(e);
+            await this.send.sendErrorsend(e);
         }
     }
 
@@ -170,17 +192,17 @@ class Nations{
         try {
             const commandString = `/nation townlist nation: ${nation} server: ${server}`;
 
-            const nations = OfficialApi.nation(nation);
+            const nations = await OfficialAPI.nation(nation);
 
 
             const townsString = CommandTools.listToString(nations.towns);
 
             const fields = ["Towns", "```" + townsString.slice(0, 1018) + "```", true]
 
-            await this.Send.sendUserEmbed(fields);
+            await this.send.sendUsersend(fields);
 
         } catch (e) {
-            await this.Send.sendErrorEmbed(e);
+            await this.send.sendErrorsend(e);
         }
     }
 
@@ -188,34 +210,28 @@ class Nations{
         try {
             const commandString = `/nation unallied nation: ${nation} server: ${server}`;
 
-            const nations = OfficialApi.nation(nation);
-            const allNationsLookup = OfficialApi.nation.all();
-
+            const nations = await OfficialAPI.nation(nation);
             
 
-            const allyList = nations.allies;
-            const allNations = allNationsLookup.allNations.slice();
-
-            allNations.splice(allNations.indexOf(nations.strings.nation), 1);
-
-            const unalliedList = allNations.filter(nation => !allyList.includes(nation));
+        
+            const unalliedList = nations.unalliedList
 
             if (unalliedList.length !== 0) {
                 for (let i = 0; i < unalliedList.length; i += 15) {
                     const unalliedString = unalliedList.slice(i, i + 15).join(' ');
                     const fields = [i > 0 ? 'Unallied (Continued)' : 'Unallied', "```" + unalliedString + "```", true]
-                    await this.Send.sendUserEmbed(fields);
+                    await this.send.sendUsersend(fields);
                 }
 
             } else {
                 const fields = ["Unallied", `${nations.unallied} has allied everyone :)`, true]
-                await this.Send.sendUserEmbed(fields);
+                await this.send.sendUsersend(fields);
             }
 
             
 
         } catch (e) {
-            await this.Send.sendErrorEmbed(e);
+            await this.send.sendErrorsend(e);
         }
     }
 

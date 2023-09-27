@@ -1,6 +1,8 @@
-import { Client, User, Message } from 'discord.js';
+import { Client, User,Embed } from 'discord.js';
 
-class send {
+
+
+class Send {
     private entity: Client;
 
     constructor(entity: Client) {
@@ -11,7 +13,7 @@ class send {
         try {
             await user.send(content);
         } catch (e) {
-            await this.sendErrorEmbed(e);
+            await this.sendErrorsend(e);
         }
     }
 
@@ -24,16 +26,16 @@ class send {
         }
     }
 
-    public async sendUserEmbed(embed: object) {
+    public async sendUsersend(send: object) {
         const user = this.entity.user;
         if (user) {
-            await this.sendMessageUser(user, { embed });
+            await this.sendMessageUser(user, { send });
         } else {
             throw new Error("User is null or undefined.");
         }
     }
 
-    public async sendErrorEmbed(error: any) {
+    public async sendErrorsend(error: any) {
         const user = this.entity.user;
         if (user) {
             await this.sendMessageUser(user, `An error occurred: ${error}`);
@@ -43,4 +45,4 @@ class send {
     }
 }
 
-export { send };
+export { Send };

@@ -39,11 +39,11 @@ exports.__esModule = true;
 exports.Nations = void 0;
 var CommandTools_1 = require("./utils/CommandTools");
 var earthmc_1 = require("earthmc");
-var earthmc_2 = require("earthmc");
+var discord_js_1 = require("discord.js");
 var Nations = /** @class */ (function () {
-    function Nations(entity, Send) {
+    function Nations(entity, send) {
         this.entity = entity;
-        this.Send = Send;
+        this.send = send;
     }
     Nations.prototype.nation = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -55,13 +55,13 @@ var Nations = /** @class */ (function () {
                         if (!this.entity.user) {
                             throw new Error("User is null or undefined.");
                         }
-                        return [4 /*yield*/, this.Send.sendUserMessage('This is the main /nation command. Use subcommands like `/nation search`, `/nation reslist`, etc.')];
+                        return [4 /*yield*/, this.send.sendUserMessage('This is the main /nation command. Use subcommands like `/nation search`, `/nation reslist`, etc.')];
                     case 1:
                         _a.sent();
                         return [3 /*break*/, 4];
                     case 2:
                         e_1 = _a.sent();
-                        return [4 /*yield*/, this.Send.sendErrorEmbed(e_1)];
+                        return [4 /*yield*/, this.send.sendErrorsend(e_1)];
                     case 3:
                         _a.sent();
                         return [3 /*break*/, 4];
@@ -71,51 +71,39 @@ var Nations = /** @class */ (function () {
         });
     };
     Nations.prototype.search = function (nation, server) {
-        if (nation === void 0) { nation = "random"; }
         if (server === void 0) { server = "aurora"; }
         return __awaiter(this, void 0, void 0, function () {
-            var commandString, allNationsLookup, nations, locationUrl, chunks_worth, alliance, fields, e_2;
+            var commandString, nations, locationUrl, chunks_worth, embed, e_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 4]);
+                        _a.trys.push([0, 3, , 5]);
                         commandString = "/nation search nation: " + nation + " server: " + server;
                         if (!this.entity.user) {
                             throw new Error("User is null or undefined.");
                         }
-                        if (nation.toLowerCase() === "random") {
-                            allNationsLookup = earthmc_2.OfficialApi.nations.all();
-                            nation = String(CommandTools_1.CommandTools.random_choice(allNationsLookup.allNations));
-                        }
-                        nations = earthmc_2.OfficialApi.nation(nation);
+                        return [4 /*yield*/, earthmc_1.OfficialAPI.nation(nation)];
+                    case 1:
+                        nations = _a.sent();
                         locationUrl = "https://earthmc.net/map/" + server + "/?zoom=4&x=" + nations.spawn.x + "&z=" + nations.spawn.z;
                         chunks_worth = nations.Chunks * 16;
-                        alliance = earthmc_1.Aurora.alliance(nation);
-                        fields = [
-                            { name: '', value: this.entity.user.avatarURL, inline: true },
-                            { name: 'Name', value: nations.name, inline: true },
-                            { name: "King", value: nations.King, inline: true },
-                            { name: "Capital", value: nations.Capital, inline: true },
-                            { name: "Rank", value: nations.ranklist, inline: true },
-                            { name: "Location", value: "[" + Math.round(nations.spawn.x) + ", " + Math.round(nations.spawn.z) + "](" + locationUrl + ")", inline: true },
-                            { name: "Alliance", value: alliance, inline: true },
-                            { name: "Residents", value: nations.stats.numResidents.toString(), inline: true },
-                            { name: "Towns", value: nations.stats.numTowns.toString(), inline: true },
-                            { name: "Chunks (" + chunks_worth + " worth of gold)", value: nations.Chunks, inline: true },
-                            { name: "Quoried by " + this.entity.user.username, inline: true },
-                            { name: 'bot desinged and coded by charis_k', inline: true }
-                        ];
-                        return [4 /*yield*/, this.Send.sendUserEmbed(fields)];
-                    case 1:
-                        _a.sent();
-                        return [3 /*break*/, 4];
+                        embed = new discord_js_1.EmbedBuilder()
+                            .setAuthor(this.entity.user.displayName.toString)
+                            .setDescription(commandString)
+                            .setColor('DarkGreen')
+                            .setTitle("info for " + nation + " nation");
+                        embed.addFields({ name: 'Name', value: nation, inline: true }, { name: "King", value: nations.King, inline: true }, { name: "Balance", value: nations.balance, inline: true }, { name: "Chunks " + chunks_worth, value: nations.Chunks, inline: true }, { name: "Location", value: "[" + Math.round(nations.spawn.x) + ", " + Math.round(nations.spawn.z) + "](" + locationUrl + ")", inline: true }, { name: 'Towns', value: nations.Towns.toString(), inline: true }, { name: 'Residents', value: nations.residents.toString(), inline: true });
+                        return [4 /*yield*/, this.send.sendUsersend(embed)];
                     case 2:
-                        e_2 = _a.sent();
-                        return [4 /*yield*/, this.Send.sendErrorEmbed(e_2)];
-                    case 3:
                         _a.sent();
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
+                        return [3 /*break*/, 5];
+                    case 3:
+                        e_2 = _a.sent();
+                        return [4 /*yield*/, this.send.sendErrorsend(e_2)];
+                    case 4:
+                        _a.sent();
+                        return [3 /*break*/, 5];
+                    case 5: return [2 /*return*/];
                 }
             });
         });
@@ -123,26 +111,38 @@ var Nations = /** @class */ (function () {
     Nations.prototype.reslist = function (nation, server) {
         if (server === void 0) { server = "aurora"; }
         return __awaiter(this, void 0, void 0, function () {
-            var commandString, nations, residentsString, fields, e_3;
+            var commandString, nations, residentsString, embed, e_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 4]);
+                        _a.trys.push([0, 5, , 7]);
                         commandString = "/nation reslist nation: " + nation + " server: " + server;
-                        nations = earthmc_2.OfficialApi.nation(nation);
-                        residentsString = CommandTools_1.CommandTools.listToString(nations.residents);
-                        fields = ["Residents", "```" + residentsString.slice(0, 1018) + "```", true];
-                        return [4 /*yield*/, this.Send.sendUserEmbed(fields)];
+                        return [4 /*yield*/, earthmc_1.OfficialAPI.nation(nation)];
                     case 1:
-                        _a.sent();
+                        nations = _a.sent();
+                        residentsString = CommandTools_1.CommandTools.listToString(nations.residents);
+                        if (!!this.entity.user) return [3 /*break*/, 2];
+                        this.send.sendUserMessage('Not possible to identify user');
                         return [3 /*break*/, 4];
                     case 2:
-                        e_3 = _a.sent();
-                        return [4 /*yield*/, this.Send.sendErrorEmbed(e_3)];
+                        embed = new discord_js_1.EmbedBuilder()
+                            .setAuthor(this.entity.user.displayName.toString)
+                            .setDescription(commandString)
+                            .setColor('DarkGreen')
+                            .setTitle("info for " + nation + " nation")
+                            .addFields({ name: 'Residents', value: residentsString, inline: true });
+                        return [4 /*yield*/, this.send.sendUsersend(embed)];
                     case 3:
                         _a.sent();
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
+                        _a.label = 4;
+                    case 4: return [3 /*break*/, 7];
+                    case 5:
+                        e_3 = _a.sent();
+                        return [4 /*yield*/, this.send.sendErrorsend(e_3)];
+                    case 6:
+                        _a.sent();
+                        return [3 /*break*/, 7];
+                    case 7: return [2 /*return*/];
                 }
             });
         });
@@ -154,35 +154,37 @@ var Nations = /** @class */ (function () {
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0:
-                        _c.trys.push([0, 5, , 7]);
+                        _c.trys.push([0, 6, , 8]);
                         commandString = "/nation ranklist nation: " + nation + " server: " + server;
-                        nations = earthmc_2.OfficialApi.nation(nation);
+                        return [4 /*yield*/, earthmc_1.OfficialAPI.nation(nation)];
+                    case 1:
+                        nations = _c.sent();
                         _a = [];
                         for (_b in nations.ranks)
                             _a.push(_b);
                         _i = 0;
-                        _c.label = 1;
-                    case 1:
-                        if (!(_i < _a.length)) return [3 /*break*/, 4];
+                        _c.label = 2;
+                    case 2:
+                        if (!(_i < _a.length)) return [3 /*break*/, 5];
                         rank = _a[_i];
-                        if (!nations.ranks.hasOwnProperty(rank)) return [3 /*break*/, 3];
+                        if (!nations.ranks.hasOwnProperty(rank)) return [3 /*break*/, 4];
                         rankString = CommandTools_1.CommandTools.listToString(nations.ranks[rank]);
                         fields = [rank.charAt(0).toUpperCase() + rank.slice(1), "```" + rankString.slice(0, 1022) + "```", true];
-                        return [4 /*yield*/, this.Send.sendUserEmbed(fields)];
-                    case 2:
-                        _c.sent();
-                        _c.label = 3;
+                        return [4 /*yield*/, this.send.sendUsersend(fields)];
                     case 3:
-                        _i++;
-                        return [3 /*break*/, 1];
-                    case 4: return [3 /*break*/, 7];
-                    case 5:
-                        e_4 = _c.sent();
-                        return [4 /*yield*/, this.Send.sendErrorEmbed(e_4)];
-                    case 6:
                         _c.sent();
-                        return [3 /*break*/, 7];
-                    case 7: return [2 /*return*/];
+                        _c.label = 4;
+                    case 4:
+                        _i++;
+                        return [3 /*break*/, 2];
+                    case 5: return [3 /*break*/, 8];
+                    case 6:
+                        e_4 = _c.sent();
+                        return [4 /*yield*/, this.send.sendErrorsend(e_4)];
+                    case 7:
+                        _c.sent();
+                        return [3 /*break*/, 8];
+                    case 8: return [2 /*return*/];
                 }
             });
         });
@@ -190,34 +192,50 @@ var Nations = /** @class */ (function () {
     Nations.prototype.allylist = function (nation, server) {
         if (server === void 0) { server = "aurora"; }
         return __awaiter(this, void 0, void 0, function () {
-            var commandString, nations, alliesString, fields, fields, e_5;
+            var commandString, nations, alliesString, embed, embed, e_5;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 5, , 7]);
+                        _a.trys.push([0, 6, , 8]);
                         commandString = "/nation allylist nation: " + nation + " server: " + server;
-                        nations = earthmc_2.OfficialApi.nation(nation);
-                        if (!(nations.allies.length !== 0)) return [3 /*break*/, 2];
-                        alliesString = CommandTools_1.CommandTools.listToString(nations.allies);
-                        fields = ["Allies", "```" + alliesString.slice(0, 1018) + "```", true];
-                        return [4 /*yield*/, this.Send.sendUserEmbed(fields)];
+                        return [4 /*yield*/, earthmc_1.OfficialAPI.nation(nation)];
                     case 1:
-                        _a.sent();
-                        return [3 /*break*/, 4];
+                        nations = _a.sent();
+                        if (!(nations.allies.length !== 0)) return [3 /*break*/, 3];
+                        alliesString = CommandTools_1.CommandTools.listToString(nations.allies);
+                        embed = new discord_js_1.EmbedBuilder();
+                        if (this.entity.user) {
+                            embed.setAuthor(this.entity.user.displayName.toString);
+                        }
+                        embed.setDescription(commandString);
+                        embed.setColor('DarkGreen');
+                        embed.setTitle("info for " + nation + " nation");
+                        embed.addFields({ name: 'Allies', value: alliesString, inline: true });
+                        return [4 /*yield*/, this.send.sendUsersend(embed)];
                     case 2:
-                        fields = ["Allies", nations.allies + " has no allies :)", true];
-                        return [4 /*yield*/, this.Send.sendUserEmbed(fields)];
+                        _a.sent();
+                        return [3 /*break*/, 5];
                     case 3:
+                        embed = new discord_js_1.EmbedBuilder();
+                        if (this.entity.user) {
+                            embed.setAuthor(this.entity.user.displayName.toString);
+                        }
+                        embed.setDescription(commandString);
+                        embed.setColor('DarkGreen');
+                        embed.setTitle("info for " + nation + " nation");
+                        embed.addFields({ name: 'This nation has no allied nations :/', value: '', inline: true });
+                        return [4 /*yield*/, this.send.sendUsersend(embed)];
+                    case 4:
                         _a.sent();
-                        _a.label = 4;
-                    case 4: return [3 /*break*/, 7];
-                    case 5:
-                        e_5 = _a.sent();
-                        return [4 /*yield*/, this.Send.sendErrorEmbed(e_5)];
+                        _a.label = 5;
+                    case 5: return [3 /*break*/, 8];
                     case 6:
+                        e_5 = _a.sent();
+                        return [4 /*yield*/, this.send.sendErrorsend(e_5)];
+                    case 7:
                         _a.sent();
-                        return [3 /*break*/, 7];
-                    case 7: return [2 /*return*/];
+                        return [3 /*break*/, 8];
+                    case 8: return [2 /*return*/];
                 }
             });
         });
@@ -229,30 +247,32 @@ var Nations = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 5, , 7]);
+                        _a.trys.push([0, 6, , 8]);
                         commandString = "/nation enemylist nation: " + nation + " server: " + server;
-                        nations = earthmc_2.OfficialApi.nation(nation);
-                        if (!(nations.enemies.length !== 0)) return [3 /*break*/, 2];
+                        return [4 /*yield*/, earthmc_1.OfficialAPI.nation(nation)];
+                    case 1:
+                        nations = _a.sent();
+                        if (!(nations.enemies.length !== 0)) return [3 /*break*/, 3];
                         enemiesString = CommandTools_1.CommandTools.listToString(nations.enemies);
                         fields = ["Enemies", "```" + enemiesString.slice(0, 1018) + "```", true];
-                        return [4 /*yield*/, this.Send.sendUserEmbed(fields)];
-                    case 1:
-                        _a.sent();
-                        return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.send.sendUsersend(fields)];
                     case 2:
-                        fields = ["Enemies", nations.enemies + " has no enemies :)", true];
-                        return [4 /*yield*/, this.Send.sendUserEmbed(fields)];
+                        _a.sent();
+                        return [3 /*break*/, 5];
                     case 3:
+                        fields = ["Enemies", nations.enemies + " has no enemies :)", true];
+                        return [4 /*yield*/, this.send.sendUsersend(fields)];
+                    case 4:
                         _a.sent();
-                        _a.label = 4;
-                    case 4: return [3 /*break*/, 7];
-                    case 5:
-                        e_6 = _a.sent();
-                        return [4 /*yield*/, this.Send.sendErrorEmbed(e_6)];
+                        _a.label = 5;
+                    case 5: return [3 /*break*/, 8];
                     case 6:
+                        e_6 = _a.sent();
+                        return [4 /*yield*/, this.send.sendErrorsend(e_6)];
+                    case 7:
                         _a.sent();
-                        return [3 /*break*/, 7];
-                    case 7: return [2 /*return*/];
+                        return [3 /*break*/, 8];
+                    case 8: return [2 /*return*/];
                 }
             });
         });
@@ -264,22 +284,24 @@ var Nations = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 4]);
+                        _a.trys.push([0, 3, , 5]);
                         commandString = "/nation townlist nation: " + nation + " server: " + server;
-                        nations = earthmc_2.OfficialApi.nation(nation);
+                        return [4 /*yield*/, earthmc_1.OfficialAPI.nation(nation)];
+                    case 1:
+                        nations = _a.sent();
                         townsString = CommandTools_1.CommandTools.listToString(nations.towns);
                         fields = ["Towns", "```" + townsString.slice(0, 1018) + "```", true];
-                        return [4 /*yield*/, this.Send.sendUserEmbed(fields)];
-                    case 1:
-                        _a.sent();
-                        return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.send.sendUsersend(fields)];
                     case 2:
-                        e_7 = _a.sent();
-                        return [4 /*yield*/, this.Send.sendErrorEmbed(e_7)];
-                    case 3:
                         _a.sent();
-                        return [3 /*break*/, 4];
-                    case 4: return [2 /*return*/];
+                        return [3 /*break*/, 5];
+                    case 3:
+                        e_7 = _a.sent();
+                        return [4 /*yield*/, this.send.sendErrorsend(e_7)];
+                    case 4:
+                        _a.sent();
+                        return [3 /*break*/, 5];
+                    case 5: return [2 /*return*/];
                 }
             });
         });
@@ -287,47 +309,45 @@ var Nations = /** @class */ (function () {
     Nations.prototype.unallied = function (nation, server) {
         if (server === void 0) { server = "aurora"; }
         return __awaiter(this, void 0, void 0, function () {
-            var commandString, nations, allNationsLookup, allyList_1, allNations, unalliedList, i, unalliedString, fields, fields, e_8;
+            var commandString, nations, unalliedList, i, unalliedString, fields, fields, e_8;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 8, , 10]);
+                        _a.trys.push([0, 9, , 11]);
                         commandString = "/nation unallied nation: " + nation + " server: " + server;
-                        nations = earthmc_2.OfficialApi.nation(nation);
-                        allNationsLookup = earthmc_2.OfficialApi.nation.all();
-                        allyList_1 = nations.allies;
-                        allNations = allNationsLookup.allNations.slice();
-                        allNations.splice(allNations.indexOf(nations.strings.nation), 1);
-                        unalliedList = allNations.filter(function (nation) { return !allyList_1.includes(nation); });
-                        if (!(unalliedList.length !== 0)) return [3 /*break*/, 5];
-                        i = 0;
-                        _a.label = 1;
+                        return [4 /*yield*/, earthmc_1.OfficialAPI.nation(nation)];
                     case 1:
-                        if (!(i < unalliedList.length)) return [3 /*break*/, 4];
+                        nations = _a.sent();
+                        unalliedList = nations.unalliedList;
+                        if (!(unalliedList.length !== 0)) return [3 /*break*/, 6];
+                        i = 0;
+                        _a.label = 2;
+                    case 2:
+                        if (!(i < unalliedList.length)) return [3 /*break*/, 5];
                         unalliedString = unalliedList.slice(i, i + 15).join(' ');
                         fields = [i > 0 ? 'Unallied (Continued)' : 'Unallied', "```" + unalliedString + "```", true];
-                        return [4 /*yield*/, this.Send.sendUserEmbed(fields)];
-                    case 2:
-                        _a.sent();
-                        _a.label = 3;
+                        return [4 /*yield*/, this.send.sendUsersend(fields)];
                     case 3:
+                        _a.sent();
+                        _a.label = 4;
+                    case 4:
                         i += 15;
-                        return [3 /*break*/, 1];
-                    case 4: return [3 /*break*/, 7];
-                    case 5:
-                        fields = ["Unallied", nations.unallied + " has allied everyone :)", true];
-                        return [4 /*yield*/, this.Send.sendUserEmbed(fields)];
+                        return [3 /*break*/, 2];
+                    case 5: return [3 /*break*/, 8];
                     case 6:
+                        fields = ["Unallied", nations.unallied + " has allied everyone :)", true];
+                        return [4 /*yield*/, this.send.sendUsersend(fields)];
+                    case 7:
                         _a.sent();
-                        _a.label = 7;
-                    case 7: return [3 /*break*/, 10];
-                    case 8:
-                        e_8 = _a.sent();
-                        return [4 /*yield*/, this.Send.sendErrorEmbed(e_8)];
+                        _a.label = 8;
+                    case 8: return [3 /*break*/, 11];
                     case 9:
+                        e_8 = _a.sent();
+                        return [4 /*yield*/, this.send.sendErrorsend(e_8)];
+                    case 10:
                         _a.sent();
-                        return [3 /*break*/, 10];
-                    case 10: return [2 /*return*/];
+                        return [3 /*break*/, 11];
+                    case 11: return [2 /*return*/];
                 }
             });
         });

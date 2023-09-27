@@ -41,11 +41,9 @@ var Nations_1 = require("./src/Nations");
 var Players_1 = require("./src/Players");
 var Towns_1 = require("./src/Towns");
 var send_1 = require("./src/utils/send");
-var levels_1 = require("./src/levels");
-var alliance_1 = require("./src/alliance");
 var devcommands_1 = require("./src/devcommands");
-// Set up the client with specified options
-var client = new discord.Client({
+var framework_1 = require("@sapphire/framework");
+var client = new framework_1.SapphireClient({
     intents: [
         discord.GatewayIntentBits.Guilds,
         discord.GatewayIntentBits.GuildMessages,
@@ -63,153 +61,134 @@ var client = new discord.Client({
         status: 'online'
     }
 });
-var Send = new send_1.send(client);
-var nationCommand = new Nations_1.Nations(client, Send);
-var townCommand = new Towns_1.TownCommand(client, Send);
-var playerCommand = new Players_1.playercommand(client, Send);
-var level = new levels_1.Level(client, Send);
-var alliance = new alliance_1.Alliance(client, Send);
-var dev = new devcommands_1.Devcommands(client, Send);
+var send = new send_1.Send(client);
+var nationCommand = new Nations_1.Nations(client, send);
+var townCommand = new Towns_1.TownCommand(client, send);
+var playerCommand = new Players_1.playercommand(client, send);
+var dev = new devcommands_1.Devcommands(client, send);
 client.on('message', function (message) { return __awaiter(void 0, void 0, void 0, function () {
-    var args, command, subCommand, subCommand, subCommand, subCommand, subCommand, subCommand;
-    var _a, _b, _c, _d, _e, _f, _g;
-    return __generator(this, function (_h) {
-        switch (_h.label) {
+    var args, command, subCommand, subCommand, subCommand, subCommand;
+    var _a, _b, _c, _d, _e, _f;
+    return __generator(this, function (_g) {
+        switch (_g.label) {
             case 0:
-                if (message.author.bot) {
-                    Send.sendUserMessage('stop spamming me you stupid #####');
+                if ((_a = client.user) === null || _a === void 0 ? void 0 : _a.bot) {
+                    send.sendUserMessage('sorry i dont accept commands from bots ');
                 }
-                args = message.content.split(' ');
-                command = (_a = args.shift()) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+                args = client.on.arguments.slice('');
+                command = (_b = args.shift()) === null || _b === void 0 ? void 0 : _b.toLowerCase();
                 if (!(command === '/nation')) return [3 /*break*/, 17];
-                subCommand = (_b = args[0]) === null || _b === void 0 ? void 0 : _b.toLowerCase();
+                subCommand = (_c = args[0]) === null || _c === void 0 ? void 0 : _c.toLowerCase();
                 if (!(subCommand === 'search')) return [3 /*break*/, 2];
                 return [4 /*yield*/, nationCommand.search(args[1], args[2])];
             case 1:
-                _h.sent();
+                _g.sent();
                 return [3 /*break*/, 16];
             case 2:
                 if (!(subCommand === 'reslist')) return [3 /*break*/, 4];
                 return [4 /*yield*/, nationCommand.reslist(args[1], args[2])];
             case 3:
-                _h.sent();
+                _g.sent();
                 return [3 /*break*/, 16];
             case 4:
                 if (!(subCommand === 'ranklist')) return [3 /*break*/, 6];
                 return [4 /*yield*/, nationCommand.ranklist(args[1], args[2])];
             case 5:
-                _h.sent();
+                _g.sent();
                 return [3 /*break*/, 16];
             case 6:
                 if (!(subCommand === 'allylist')) return [3 /*break*/, 8];
                 return [4 /*yield*/, nationCommand.allylist(args[1], args[2])];
             case 7:
-                _h.sent();
+                _g.sent();
                 return [3 /*break*/, 16];
             case 8:
                 if (!(subCommand === 'enemylist')) return [3 /*break*/, 10];
                 return [4 /*yield*/, nationCommand.enemylist(args[1], args[2])];
             case 9:
-                _h.sent();
+                _g.sent();
                 return [3 /*break*/, 16];
             case 10:
                 if (!(subCommand === 'townlist')) return [3 /*break*/, 12];
                 return [4 /*yield*/, nationCommand.townlist(args[1], args[2])];
             case 11:
-                _h.sent();
+                _g.sent();
                 return [3 /*break*/, 16];
             case 12:
                 if (!(subCommand === 'unallied')) return [3 /*break*/, 14];
                 return [4 /*yield*/, nationCommand.unallied(args[1], args[2])];
             case 13:
-                _h.sent();
+                _g.sent();
                 return [3 /*break*/, 16];
             case 14: return [4 /*yield*/, nationCommand.nation()];
             case 15:
-                _h.sent();
-                _h.label = 16;
-            case 16: return [3 /*break*/, 41];
+                _g.sent();
+                _g.label = 16;
+            case 16: return [3 /*break*/, 35];
             case 17:
                 if (!(command === '/town')) return [3 /*break*/, 24];
-                subCommand = (_c = args[0]) === null || _c === void 0 ? void 0 : _c.toLowerCase();
+                subCommand = (_d = args[0]) === null || _d === void 0 ? void 0 : _d.toLowerCase();
                 if (!(subCommand === 'search')) return [3 /*break*/, 19];
                 return [4 /*yield*/, townCommand.search(args[1])];
             case 18:
-                _h.sent();
+                _g.sent();
                 return [3 /*break*/, 23];
             case 19:
                 if (!(subCommand === 'rank')) return [3 /*break*/, 21];
                 return [4 /*yield*/, townCommand.ranklist(args[1])];
             case 20:
-                _h.sent();
+                _g.sent();
                 return [3 /*break*/, 23];
             case 21:
                 if (!(subCommand === 'ranklist')) return [3 /*break*/, 23];
                 return [4 /*yield*/, townCommand.ranklist(args[1])];
             case 22:
-                _h.sent();
-                _h.label = 23;
-            case 23: return [3 /*break*/, 41];
+                _g.sent();
+                _g.label = 23;
+            case 23: return [3 /*break*/, 35];
             case 24:
                 if (!(command === '/player')) return [3 /*break*/, 31];
-                subCommand = (_d = args[0]) === null || _d === void 0 ? void 0 : _d.toLowerCase();
+                subCommand = (_e = args[0]) === null || _e === void 0 ? void 0 : _e.toLowerCase();
                 if (!(subCommand === 'search')) return [3 /*break*/, 26];
                 return [4 /*yield*/, playerCommand.search(args[1])];
             case 25:
-                _h.sent();
+                _g.sent();
                 return [3 /*break*/, 30];
             case 26:
                 if (!(subCommand === 'friendlist')) return [3 /*break*/, 28];
                 return [4 /*yield*/, playerCommand.friendlist(args[1])];
             case 27:
-                _h.sent();
+                _g.sent();
                 return [3 /*break*/, 30];
             case 28:
                 if (!(subCommand === 'rank')) return [3 /*break*/, 30];
-                return [4 /*yield*/, playerCommand.rank(args[1], args[2])];
+                return [4 /*yield*/, playerCommand.rank(args[1])];
             case 29:
-                _h.sent();
-                _h.label = 30;
-            case 30: return [3 /*break*/, 41];
+                _g.sent();
+                _g.label = 30;
+            case 30: return [3 /*break*/, 35];
             case 31:
-                if (!(command === '/levels')) return [3 /*break*/, 34];
-                subCommand = (_e = args[0]) === null || _e === void 0 ? void 0 : _e.toLowerCase();
-                if (!(subCommand === 'show')) return [3 /*break*/, 33];
-                return [4 /*yield*/, level.showlevel(args[1])];
-            case 32:
-                _h.sent();
-                _h.label = 33;
-            case 33: return [3 /*break*/, 41];
-            case 34:
-                if (!(command === '/a')) return [3 /*break*/, 37];
+                if (!(command === '/dev')) return [3 /*break*/, 35];
                 subCommand = (_f = args[0]) === null || _f === void 0 ? void 0 : _f.toLowerCase();
-                if (!(subCommand === 'info')) return [3 /*break*/, 36];
-                return [4 /*yield*/, alliance.info(args[1])];
-            case 35:
-                _h.sent();
-                _h.label = 36;
-            case 36: return [3 /*break*/, 41];
-            case 37:
-                if (!(command === '/dev')) return [3 /*break*/, 41];
-                subCommand = (_g = args[0]) === null || _g === void 0 ? void 0 : _g.toLowerCase();
-                if (!(subCommand === 'restart')) return [3 /*break*/, 39];
+                if (!(subCommand === 'restart')) return [3 /*break*/, 33];
                 return [4 /*yield*/, dev.restart()];
-            case 38:
-                _h.sent();
-                return [3 /*break*/, 41];
-            case 39:
-                if (!(subCommand === 'stop')) return [3 /*break*/, 41];
+            case 32:
+                _g.sent();
+                return [3 /*break*/, 35];
+            case 33:
+                if (!(subCommand === 'stop')) return [3 /*break*/, 35];
                 return [4 /*yield*/, dev.stop()];
-            case 40:
-                _h.sent();
-                _h.label = 41;
-            case 41: return [2 /*return*/];
+            case 34:
+                _g.sent();
+                _g.label = 35;
+            case 35: return [2 /*return*/];
         }
     });
 }); });
 try {
     var token = 'MTEyMTc1MTQwMDI5NzI3OTU0OQ.GDw6hv.Zzu0SdPCYrJKJARPg60oEzB71Gyqqe-9WEeHHQ';
     client.login(token);
+    console.log('Login sucessful');
 }
 catch (e) {
     throw new Error;
