@@ -1,30 +1,31 @@
 import {CommandTools} from "./utils/CommandTools";
-import {Send} from './utils/send';
+import { Embeds } from "./utils/embed";
 import { OfficialAPI } from 'earthmc';
-import { EmbedBuilder,Embed ,Client, Options} from "discord.js";
-
+import { Client, } from "discord.js";
 class Nations{
    private entity: Client ;
-   private send: Send
 
-  constructor(entity: Client,send:Send) {
+  constructor(entity: Client) {
     this.entity = entity;
-    this.send = send;
   }
+    footer = 'Made by charis_k'
 
     async nation() {
         try {
             if (!this.entity.user) {
                 throw new Error("User is null or undefined.");
             }
-
-            await this.send.sendUserMessage('This is the main /nation command. Use subcommands like `/nation search`, `/nation reslist`, etc.');
+            this.entity.on("messasge" ,async ( message) =>  {
+                if(message){
+                    this.entity.user?.send(`${message.author} this is the main /nation command use the subcommands`)
+                }
+             })
+            
 
         } catch (e) {
-            await this.send.sendErrorsend(e);
+            this.entity.user?.send(`an error ${e} occured`)
         }
     }
-
     async search(nation: string , server: string = "aurora") {
         try {
             const commandString = `/nation search nation: ${nation} server: ${server}`;
@@ -43,13 +44,11 @@ class Nations{
             const chunks_worth = nations.Chunks * 16;
 
 
-            const embed = new EmbedBuilder()
-                .setAuthor(this.entity.user.displayName.toString)
-                .setDescription(commandString)
-                .setColor('DarkGreen')
-                .setTitle(`info for ${nation} nation`)
+            const embed = Embeds.embedBuilder(commandString,this.footer)
+            
+            
             embed.addFields(
-                { name: 'Name', value: nation, inline: true },
+                { name: 'Name', value: `${nation}`, inline: true },
                 { name: "King", value: nations.King, inline: true },
                 { name: "Balance",value: nations.balance, inline: true},
                 { name:`Chunks ${chunks_worth}`,value:nations.Chunks,inline: true},
@@ -57,11 +56,20 @@ class Nations{
                 { name:'Towns',value:nations.Towns.toString(),inline:true}, 
                 { name:'Residents',value:nations.residents.toString(),inline:true},                   
                 )
-                
-            await this.send.sendUsersend(embed);
+            this.entity.on('message', async (messasge)=> {
+                const user = messasge.author
+                user.send(embed)
+            })
 
         } catch (e) {
-            await this.send.sendErrorsend(e);
+            this.entity.on('message', async (message)=> {
+                const user = message.author
+                const embed = Embeds.errorEmbed(e,'Unexpected error')
+                user.send({embed})
+            })
+
+            
+
         }
         
     }
@@ -72,25 +80,26 @@ class Nations{
 
             const nations = await OfficialAPI.nation(nation);
             const residentsString = CommandTools.listToString(nations.residents);
-
-            if (!this.entity.user){
-                this.send.sendUserMessage('Not possible to identify user')
-            }
-            else{
-                const embed = new EmbedBuilder()
-                    .setAuthor(this.entity.user.displayName.toString)
-                    .setDescription(commandString)
-                    .setColor('DarkGreen')
-                    .setTitle(`info for ${nation} nation`)
-                    .addFields(
-                        { name:'Residents',value:residentsString,inline:true}
-                        )
-                await this.send.sendUsersend(embed);
-
-            }
-
+        
+            const embed = Embeds.embedBuilder(commandString,this.footer)
+            
+            
+            embed.addFields(
+                { name: 'Name', value: `${nation}`, inline: true },
+                { name: "Residents", value: residentsString, inline: true },
+                         
+                )
+            this.entity.on('message', async (message)=> {
+                const user = message.author
+                user.send({embed})
+            })
+            
         } catch (e) {
-            await this.send.sendErrorsend(e);
+            this.entity.on("message",async (message) => {
+                const user = message.author
+                const embed = Embeds.errorEmbed(e,this.footer)
+                user.send({embed})
+            })
         }
     }
 
@@ -103,18 +112,28 @@ class Nations{
             
 
             for (const rank in nations.ranks) {
-                if (nations.ranks.hasOwnProperty(rank)) {
+                if (nations.ranks) {
                     const rankString = CommandTools.listToString(nations.ranks[rank]);
+                    const embed = Embeds.embedBuilder(commandString,this.footer);
+                    embed.addFields(
+                        {name:"Name",value:nation,inline:true},
+                        {name:'Rank',value:rankString}
+                    )
+                    this.entity.on("message",async (message) => {
+                        const user = message.author
+                        user.send({embed})
+                    })
 
-                    const fields = [rank.charAt(0).toUpperCase() + rank.slice(1), "```" + rankString.slice(0, 1022) + "```", true]
-                    await this.send.sendUsersend(fields);
                 }
             }
 
-            
 
         } catch (e) {
-            await this.send.sendErrorsend(e);
+            this.entity.on("message",async (message) => {
+                const user = message.author
+                const embed = Embeds.errorEmbed(e,this.footer)
+                user.send({embed})
+            })
         }
     }
 
@@ -128,38 +147,34 @@ class Nations{
 
             if (nations.allies.length !== 0) {
                 const alliesString = CommandTools.listToString(nations.allies);
-                const embed = new EmbedBuilder()
-                if (this.entity.user){
-                    embed.setAuthor(this.entity.user.displayName.toString)}
-                
-                embed.setDescription(commandString)
-                embed.setColor('DarkGreen')
-                embed.setTitle(`info for ${nation} nation`)
+                const embed = Embeds.embedBuilder(commandString,this.footer);
                 embed.addFields(
-                    { name:'Allies',value:alliesString,inline:true}
-                    )
-
-            await this.send.sendUsersend(embed);
+                    { name:'Name',value:nation,inline:true},
+                    { name :'Allies' , value : `${alliesString}`,inline:true },
+                )
+                this.entity.on('message', async (message)=> {
+                    const user = message.author
+                    user.send({embed})
+                })
                 
             } else {
-                const embed = new EmbedBuilder()
-                    if (this.entity.user){
-                        embed.setAuthor(this.entity.user.displayName.toString)}
-                    
-                    embed.setDescription(commandString)
-                    embed.setColor('DarkGreen')
-                    embed.setTitle(`info for ${nation} nation`)
-                    embed.addFields(
-                        { name:'This nation has no allied nations :/',value:'',inline:true}
-                        )
-
-                await this.send.sendUsersend(embed);
+                const embed = Embeds.embedBuilder(commandString,this.footer);
+                embed.addFields(
+                    { name:`Nation ${nation} has not allies :/`,value:'',inline:true},
+                )
+                this.entity.on('message', async (message)=> {
+                    const user = message.author
+                    user.send({embed})
+                })
+                
             }
 
-           
-
         } catch (e) {
-            await this.send.sendErrorsend(e);
+            const embed = Embeds.errorEmbed(e,this.footer)
+            this.entity.on('message', async (message)=> {
+                const user = message.author
+                user.send({embed})
+            })
         }
     }
 
@@ -172,19 +187,32 @@ class Nations{
             
             if (nations.enemies.length !== 0) {
                 const enemiesString = CommandTools.listToString(nations.enemies);
+                const embed = Embeds.embedBuilder(commandString,this.footer)
 
-                const fields = ["Enemies", "```" + enemiesString.slice(0, 1018) + "```", true];
-                await this.send.sendUsersend(fields);
+                embed.addFields(
+                    {name:'Name',value:nation,inline:true},
+                    {name:'Enemies',value:enemiesString,inline:true}
+                )
 
             } else {
-                const fields = ["Enemies", `${nations.enemies} has no enemies :)`, true];
-                await this.send.sendUsersend(fields);
+                const embed = Embeds.embedBuilder(commandString,this.footer)
+                embed.addFields(
+                     {name:"Nation has no enemies :)",value:'', inline:true}
+                     )
+                this.entity.on('message', async (message)=> {
+                    const user = message.author
+                    user.send({embed})
+                })
             }
 
             
 
         } catch (e) {
-            await this.send.sendErrorsend(e);
+            const embed = Embeds.errorEmbed(e,this.footer)
+            this.entity.on('message', async (message)=> {
+                const user = message.author
+                user.send({embed})
+            })
         }
     }
 
@@ -197,12 +225,22 @@ class Nations{
 
             const townsString = CommandTools.listToString(nations.towns);
 
-            const fields = ["Towns", "```" + townsString.slice(0, 1018) + "```", true]
-
-            await this.send.sendUsersend(fields);
+            const embed = Embeds.embedBuilder(commandString,this.footer);
+            embed.addFields(
+                {name:'Name',value:nation,inline:true},
+                {name:'Towns',value:townsString,inline:true},
+            )
+            this.entity.on('message', async (message)=> {
+                    const user = message.author
+                    user.send({embed})
+                })
 
         } catch (e) {
-            await this.send.sendErrorsend(e);
+            const embed = Embeds.errorEmbed(e,this.footer)
+            this.entity.on('message', async (message)=> {
+                const user = message.author
+                user.send({embed})
+            })
         }
     }
 
@@ -212,28 +250,46 @@ class Nations{
 
             const nations = await OfficialAPI.nation(nation);
             
-
-        
             const unalliedList = nations.unalliedList
 
             if (unalliedList.length !== 0) {
                 for (let i = 0; i < unalliedList.length; i += 15) {
                     const unalliedString = unalliedList.slice(i, i + 15).join(' ');
-                    const fields = [i > 0 ? 'Unallied (Continued)' : 'Unallied', "```" + unalliedString + "```", true]
-                    await this.send.sendUsersend(fields);
+                    const embed = Embeds.embedBuilder(commandString,this.footer)
+                    embed.addFields(
+                        {name:'Name',value:nation,inline:true},
+                        {name:'Unallied naitons',value:unalliedString,inline:true}
+                    )
+                    this.entity.on('message', async (message)=> {
+                        const user = message.author
+                        user.send({embed})
+                    })
                 }
 
             } else {
-                const fields = ["Unallied", `${nations.unallied} has allied everyone :)`, true]
-                await this.send.sendUsersend(fields);
+                const embed = Embeds.embedBuilder(commandString,this.footer)
+
+                embed.addFields(
+                    {name:'Name',value:nation,inline:true},
+                    {name:'Nation has no enemies :)',value:'',inline:true}
+                )
+                this.entity.on('message', async (message)=> {
+                    const user = message.author
+                    user.send({embed})
+                })
             }
 
             
 
         } catch (e) {
-            await this.send.sendErrorsend(e);
+            const embed = Embeds.errorEmbed(e,this.footer)
+            this.entity.on('message', async (message)=> {
+                const user = message.author
+                user.send({embed})
+            })
         }
     }
 
 }
+
 export {Nations}

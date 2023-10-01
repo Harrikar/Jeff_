@@ -68,4 +68,3 @@ static varnew(inputList: string[][]) {
 
 export 
   {CommandTools}
-

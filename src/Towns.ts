@@ -1,16 +1,15 @@
 import { Client } from 'discord.js';
 import { CommandTools } from "./utils/CommandTools";
 import { OfficialAPI } from 'earthmc';
-import { Send } from './utils/send';
 import {EmbedBuilder} from 'discord.js'
+import { Embeds } from './utils/embed';
 class TownCommand {
     private entity: Client;
-    private send: Send;
 
-    constructor(entity: Client, send: Send) {
+    constructor(entity: Client, ) {
         this.entity = entity;
-        this.send = send;
     }
+    footer = 'made by charis_k'
 
     async town() {
         try {
@@ -18,14 +17,24 @@ class TownCommand {
                 throw new Error("User is null or undefined.");
             }
 
-            await this.send.sendUserMessage('This is the main /town command. ');
-
+            this.entity.on("messasge" ,async (message) =>  {
+                if(message){
+                    const user = message.author
+                    await user.send('main /town command use subcommands')
+                }
+            })
         } catch (e) {
-            await this.send.sendErrorsend(e);
+            const embed = Embeds.errorEmbed(e,this.footer)
+            this.entity.on("messasge" ,async (message) =>  {
+                if(message){
+                    const user = message.author
+                    await user.send({embed})
+                }
+            })
         }
     }
 
-    async search(town: string = "random", server: string = "aurora") {
+    async search(town: string, server: string = "aurora") {
         try {
             const commandString = `/town search town: ${town} server: ${server}`;
 
@@ -35,25 +44,25 @@ class TownCommand {
 
             const townlookup = await OfficialAPI.town(town)
             const locationUrl = `https://earthmc.net/map/${server}/?zoom=4&x=${townlookup.spawn.x}&z=${townlookup.spawn.z}`;
-
-            const fields = [
+            const embed = Embeds.embedBuilder(commandString, this.footer)
+            embed.addFields(
                 {name:'Name',value:town,inline:true},
-                {name:'Residents',value:townlookup.residents.toString(),inline:true},
-                {name:`chunks`,value:townlookup.chunks.toString(),inline:true},
-                {name:'worth',value:Number(townlookup.chunks * 16 ),inline:true},
-                {name:'Nation',value:townlookup.nation,inline:true},
+                {name:'Nation',value:townlookup.Nation,inline:true},
+                {name:"Location", value: `[${Math.round(townlookup.spawn.x)}, ${Math.round(townlookup.spawn.z)}](${locationUrl})`, inline: true },
+                {name:'Residents',value:townlookup.residents.toString(),inline:true},                   
+                {name: "Balance",value: townlookup.balance, inline: true},
                 {name:'Mayor',value:townlookup.Mayor,inline:true},
-                {name:'Capital',value:townlookup.Capital,inline:true},
-                { name: "Location", value: `[${Math.round(townlookup.spawn.x)}, ${Math.round(townlookup.spawn.z)}](${locationUrl})`, inline: true },
-                {name:`Quoried by ${this.entity.user.username}`,inline:true},
-                {name:'bot desinged and coded by charis_k',inline:true}
-
-            ]
-
-            await this.send.sendUsersend(fields);
+    
+            )
 
         } catch (e) {
-            await this.send.sendErrorsend(e);
+            const embed = Embeds.errorEmbed(e,this.footer)
+            this.entity.on("messasge" ,async (message) =>  {
+                if(message){
+                    const user = message.author
+                    await user.send({embed})
+                }
+            })
         }
     }
 
@@ -63,26 +72,32 @@ class TownCommand {
 
             const townsLookup = await OfficialAPI.town(town);
 
-
             for (const rank in townsLookup.ranks) {
-                if (townsLookup.ranks.hasOwnProperty(rank)) {
+                if (townsLookup.rank) {
                     const rankString = CommandTools.listToString(townsLookup.ranks[rank]);
-                    const embed = new EmbedBuilder()
-                        if (this.entity.user){
-                            embed.setAuthor(this.entity.user.username.toString)
-                        }
-                        embed.setColor('DarkGreen')
-                        embed.setDescription(commandString)
-                        .setImage(String(this.entity.user?.avatarURL))
-                        embed.addFields(
-                            {name:'Ranklist',value:rankString,inline:true}
-                        )
-                        await this.send.sendUsersend(embed);
-                }
+                    const embed = Embeds.embedBuilder(commandString,this.footer)
+                    embed.addFields(
+                        {name:'Name',value:town,inline:true},
+                        {name:'Nation',value:townsLookup.nation,inline:true},
+                        {name:'Ranked',value:rankString,inline:true},
+                    )
+            this.entity.on("messasge" ,async (message) =>  {
+                if(message){
+                    const user = message.author
+                    await user.send({embed})
+                    }
+                })
             }
+        }
 
         } catch (e) {
-            await this.send.sendErrorsend(e);
+            const embed = Embeds.errorEmbed(e,this.footer)
+            this.entity.on("messasge" ,async (message) =>  {
+                if(message){
+                    const user = message.author
+                    await user.send({embed})
+                }
+            })
         }
     }
 }

@@ -1,7 +1,8 @@
 import { Client, Message } from 'discord.js';
-import { Send } from './utils/send';
 import * as admin from 'firebase-admin';
+import { Embeds } from './utils/embed';
 const serviceAccount = require("./jeff-db-firebase-adminsdk-qekso-80d55b4f4c.json");
+
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -13,17 +14,15 @@ const db = admin.firestore()
 
 class Level {
   private entity: Client;
-  private send: Send
-  constructor(entity: Client,send:Send) {
+  constructor(entity: Client) {
     this.entity = entity;
-    this.send = send;
   }
-
+ footer = 'made by charis_k'
   async level() {
     const usersCollection = db.collection('users');
     const usernamesCollection = db.collection('usernames'); // Collection for username mapping
 
-    this.entity.on('message', async (message: Message) => {
+    this.entity.on('message', async (message) => {
       try {
         if (!message.author.bot) {
           const userId = message.author.id;
@@ -74,8 +73,13 @@ class Level {
         }
         
       } catch (error) {
-        this.send.sendErrorsend(error);
-      }
+        this.entity.on("messasge" ,async (message) =>  {
+          if(message){
+              const user = message.author
+              const embed = Embeds.errorEmbed(error,this.footer)
+              user.send({embed})
+          }
+      })      }
     });
   }
 
@@ -92,7 +96,6 @@ class Level {
         
         if (userDoc.exists) {
           const userData = userDoc.data()!;
-          const commandString = `Level of ${username}`;
           const response = `User level: ${userData.level} (XP: ${userData.xp})`;
 
           await this.send.sendUserMessage(response);
@@ -103,7 +106,7 @@ class Level {
         await this.send.sendUserMessage('User isn\'t registered or you have an invalid or old username.');
       }
     } catch (error) {
-      this.send.sendErrorsend(error);
+      this.send.sendErrorEmbed(error);
     }
   }
   async onUserUpdate(oldUser, newUser) {

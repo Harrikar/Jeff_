@@ -1,13 +1,10 @@
 import { Client } from 'discord.js';
-import {Send} from './utils/send';
 
 class Ticket{
     private entity: Client;
-    private send: Send;
 
-    constructor(entity: Client, send: Send) {
+    constructor(entity: Client) {
         this.entity = entity;
-        this.send = send;
     }
     async ticket(){
         try{
@@ -33,7 +30,7 @@ class Ticket{
                 channel.send(`${message.author} list the reason for opening your ticket and an admin will be here to help you`)
     
             }catch(e){
-                this.send.sendErrorsend(e)
+                this.send.sendErrorEmbed(e)
             }
         })
     }
@@ -58,7 +55,7 @@ class Ticket{
                     
                 }
             }catch(e){
-                this.send.sendErrorsend(e)
+                this.send.sendErrorEmbed(e)
             }
         })
 
@@ -86,7 +83,7 @@ class Ticket{
                 }
                 ticketer.send(`your ticket was close by ${message.author}`)
             }catch(e){
-                this.send.sendErrorsend(e)
+                this.send.sendErrorEmbed(e)
             }
         })
     }

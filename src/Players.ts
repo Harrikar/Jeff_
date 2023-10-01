@@ -1,28 +1,36 @@
-import { Client, Colors } from 'discord.js';
+import { Client} from 'discord.js';
 import { CommandTools } from './utils/CommandTools';
-import { Send } from './utils/send';
-import { EmbedBuilder } from 'discord.js';
-import { OfficialAPI,Aurora } from 'earthmc';
+import { OfficialAPI } from 'earthmc';
+import { Embeds } from './utils/embed'
 
 class playercommand {
     private entity: Client;
-    private send: Send;
 
-    constructor(entity: Client, send: Send) {
+    constructor(entity: Client) {
         this.entity = entity;
-        this.send = send;
+        
     }
-
+    footer = 'made by charis_k'
     async player() {
         try {
             if (!this.entity.user) {
                 throw new Error("User is null or undefined.");
             }
-
-            await this.send.sendUserMessage(`This is the main /player command. Use subcommands like /player search`);
-        } catch (e) {
-            await this.send.sendErrorsend(e);
-        }
+            this.entity.on("messasge" ,async (message) =>  {
+                if(message){
+                    const user = message.author
+                    await user.send('main /player command use subcommands')
+                }
+            })
+            } catch (e) {
+                const embed = Embeds.errorEmbed(e,this.footer)
+                this.entity.on("messasge" ,async (message) =>  {
+                    if(message){
+                        const user = message.author
+                        await user.send({embed})
+                    }
+                })
+            }
     }
 
     async search(player: string) {
@@ -36,26 +44,33 @@ class playercommand {
 
 
             const players = await OfficialAPI.resident(player);
-            const embed = new EmbedBuilder()
-                .setAuthor(this.entity.user.displayName.toString)
-                .setDescription(commandString)
-                .setColor('DarkGreen')
-                .setTitle(`info for ${player} player`)
-                .addFields (
-                    { name:'Name',value:player,inline:true},
-                    { name:"Balance",value:String(players.balance),inline:true},
-                    { name:'Town',value:String(players.town),inline:true},
-                    { name:'Nation',value:String(players.nation),inline:true},
-                    { name:'Town Rank',value:String(players.townRanks),inline:true},
-                    { name:'Nation Rank',value:String(players.nationRanks),inline:true},
-                    
-                )   
-
-            await this.send.sendUsersend( embed);
+            const embed = Embeds.embedBuilder(commandString,this.footer)
+            embed.addFields (
+                { name:'Name',value:player,inline:true},
+                { name:"Balance",value:String(players.balance),inline:true},
+                { name:'Town',value:String(players.town),inline:true},
+                { name:'Nation',value:String(players.nation),inline:true},
+                { name:'Town Rank',value:String(players.townRanks),inline:true},
+                { name:'Nation Rank',value:String(players.nationRanks),inline:true},
+                
+            )   
+            this.entity.on("messasge" ,async (message) =>  {
+                if(message){
+                    const user = message.author
+                    await user.send({embed})
+                }
+            })
 
         } catch (e) {
-            await this.send.sendErrorsend(e);
-        }
+            const embed = Embeds.errorEmbed(e,this.footer)
+            this.entity.on("messasge" ,async (message) =>  {
+                if(message){
+                    const user = message.author
+                    await user.send({embed})
+                }
+            })
+
+            }
     }
 
     async friendlist(player: string ) {
@@ -68,21 +83,27 @@ class playercommand {
             }
             const playersLookup = await OfficialAPI.resident(player);
 
-            const embed = new EmbedBuilder()
-                .setAuthor(this.entity.user.displayName.toString)
-                .setDescription(commandString)
-                .setColor('DarkGreen')
-                .setTitle(`info for ${player} player`)
+            const embed = Embeds.embedBuilder(commandString, this.footer)
                 .addFields (
                     { name:'Name',value:player,inline:true},
                     { name:"Friends",value:String(playersLookup.friends),inline:true},
                     
                 )   
 
-            await this.send.sendUsersend(embed);
-
+                this.entity.on("messasge" ,async (message) =>  {
+                    if(message){
+                        const user = message.author
+                        await user.send({embed})
+                    }
+                })
         } catch (e) {
-            await this.send.sendErrorsend(e);
+            const embed = Embeds.errorEmbed(e,this.footer)
+            this.entity.on("messasge" ,async (message) =>  {
+                if(message){
+                    const user = message.author
+                    await user.send({embed})
+                }
+            })
         }
     }
 
@@ -97,23 +118,26 @@ class playercommand {
 
             const players = await OfficialAPI.resident(player);
             
-            const embed = new EmbedBuilder()
-                .setAuthor(this.entity.user.displayName.toString)
-                .setDescription(commandString)
-                .setColor('DarkGreen')
-                .setTitle(`info for ${player} player`)
+            const embed =Embeds.embedBuilder(commandString,this.footer)
                 .addFields (
                     { name:'Name',value:player,inline:true},
                     { name:"Town Rank",value:String(players.townRanks),inline:true},
                     { name:"Nation Rank",value:String(players.nationRanks),inline:true}
-                    
                 )   
-
-
-            await this.send.sendUsersend(embed);
-
+                this.entity.on("messasge" ,async (message) =>  {
+                    if(message){
+                        const user = message.author
+                        await user.send({embed})
+                    }
+                })
         } catch (e) {
-            await this.send.sendErrorsend(e);
+            const embed = Embeds.errorEmbed(e,this.footer)
+            this.entity.on("messasge" ,async (message) =>  {
+                if(message){
+                    const user = message.author
+                    await user.send({embed})
+                }
+            })
         }
     }
 }

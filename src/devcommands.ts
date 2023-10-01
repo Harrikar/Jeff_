@@ -1,14 +1,11 @@
 import { Client } from "discord.js";
-import { Send } from "./utils/send";
 import * as pm2 from 'pm2'; 
 
 class Devcommands {
     private entity: Client;
-    private send: Send;
 
-    constructor(entity: Client, send: Send) {
+    constructor(entity: Client) {
         this.entity = entity;
-        this.send = send;
 
     }
 
@@ -22,17 +19,15 @@ class Devcommands {
                     return;
                 }
 
-                const user = this.entity?.user
+                const user = message.author
                 const roleId = '1131896754070093954';
                 if (user){
                     const user_id = user.id
                     const member = guild.members.cache.get(user_id);
                     if (member && member.roles.cache.has(roleId)) {
-                        await this.send.sendUserMessage('restarting')
                         pm2.restart
                     } else {
-                        this.send.sendUserMessage('this command is for devs only')
-
+//
                         }
                     }
                 
