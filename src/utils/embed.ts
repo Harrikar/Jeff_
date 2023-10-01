@@ -1,3 +1,4 @@
+
 import { EmbedBuilder, User} from 'discord.js';
 
 class Embeds {
@@ -51,5 +52,3 @@ class Embeds {
     return embed;
   }
 }
-
-export { Embeds };
