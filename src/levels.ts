@@ -1,3 +1,4 @@
+'ignore'
 import { Client, Message } from 'discord.js';
 import * as admin from 'firebase-admin';
 import { Embeds } from './utils/embed';
@@ -84,31 +85,30 @@ class Level {
   }
 
   async showlevel(username: string) {
-    try {
- 
+    this.entity.on('message', async (message) => {
+      try {
+    
+          const usernameDoc = await db.collection('usernames').doc(username).get();
 
-      const usernameDoc = await db.collection('usernames').doc(username).get();
+          if (usernameDoc.exists) {
+            const { userId } = usernameDoc.data()!;
+            const userDoc = await db.collection('users').doc(userId).get();
+            const commandString = `Level of ${username}`;
+            
+            if (userDoc.exists) {
+              const userData = userDoc.data()!;
+              const response = `User level: ${userData.level} (XP: ${userData.xp})`;
 
-      if (usernameDoc.exists) {
-        const { userId } = usernameDoc.data()!;
-        const userDoc = await db.collection('users').doc(userId).get();
-        const commandString = `Level of ${username}`;
-        
-        if (userDoc.exists) {
-          const userData = userDoc.data()!;
-          const response = `User level: ${userData.level} (XP: ${userData.xp})`;
-
-          await this.send.sendUserMessage(response);
-        } else {
-          await this.send.sendUserMessage('User data not found.');
-        }
-      } else {
-        await this.send.sendUserMessage('User isn\'t registered or you have an invalid or old username.');
-      }
-    } catch (error) {
-      this.send.sendErrorEmbed(error);
+              await message.send(response)
+            } else {
+              await message.user.send('User not found')
+            }
+      }catch (error) {
+        this.send.sendErrorEmbed(error);
+      
     }
-  }
+ }
+
   async onUserUpdate(oldUser, newUser) {
     try {
       const oldUsername = oldUser.username;

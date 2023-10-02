@@ -1,4 +1,3 @@
-
 import { EmbedBuilder, User} from 'discord.js';
 
 class Embeds {
@@ -38,7 +37,7 @@ class Embeds {
     return embed;
   }
 
-  static errorEmbed(value: string, type: string | null = null, footer: string | null = null): EmbedBuilder {
+  static errorEmbed(value: any, type: string | null = null, footer: string | null = null): EmbedBuilder {
     if (type !== "userError") {
       console.error(value); 
     }
@@ -52,3 +51,4 @@ class Embeds {
     return embed;
   }
 }
+export {Embeds}

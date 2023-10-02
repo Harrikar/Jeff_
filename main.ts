@@ -2,13 +2,12 @@ import { Client, GatewayIntentBits} from 'discord.js';
 import { Nations } from './src/Nations';
 import { playercommand } from './src/Players';
 import { TownCommand } from './src/Towns';
-import { Send } from './src/utils/send';
 import { Devcommands } from './src/devcommands';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v10';
 
 const clientId = '1121751400297279549'; 
-const token = 'MTEyMTc1MTQwMDI5NzI3OTU0OQ.GegFfs.1-SaobMAHwUYEkeUvw23Sj3t2lH2fszn7-rA8A';
+const token = '';
 
 const client = new Client({
     intents: [
@@ -31,15 +30,14 @@ const client = new Client({
     }
 });
 
-const send = new Send(client);
 const nationCommand = new Nations(client);
-const townCommand = new TownCommand(client, send);
-const playerCommand = new playercommand(client, send);
-const dev = new Devcommands(client, send);
+const townCommand = new TownCommand(client);
+const playerCommand = new playercommand(client);
+const dev = new Devcommands(client);
 
 client.on('messageCreate', async (message) => {
     if (message.author.bot) {
-        await send.sendUserMessage('Sorry, I dont accept commands from bots.');
+        await message.author.send('I dont accept commands from bots')
         return;
     }
 

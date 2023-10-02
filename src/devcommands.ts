@@ -27,7 +27,9 @@ class Devcommands {
                     if (member && member.roles.cache.has(roleId)) {
                         pm2.restart
                     } else {
-//
+                        this.entity.on('message',async(message)=>{
+                            message.author.send('You are not a dev')
+                        })     
                         }
                     }
                 
@@ -53,11 +55,12 @@ class Devcommands {
                     const member = guild.members.cache.get(user.id);
 
                     if (member && member.roles.cache.has(roleId)) {
-                        await this.send.sendUserMessage('stoping')
                         pm2.stop
                     } else {
-                        this.send.sendUserMessage('this command is for devs only')
-                        
+                        this.entity.on('message',async(message)=>{
+                            message.author.send('You are not a dev')
+                        })     
+                  
                     }
                 }
             } catch (e) {
