@@ -1,10 +1,9 @@
 # Jeff_
 # A discord bot made for the emc nation of Jefferson
+discord for development , bug feature and suggesting https://discord.gg/bJ7hvhUS8T
 
 
+creator and developer (mc user :CoderHarris,discord user :charis_k,github user : Harrikar )
 
-# creator and developer (mc user :CoderHarris,discord user :charis_k,github user : Harrikar )
 
-A discord bot created for the emc nation of jefferson
-it took me a while to make so if you give a star it will encourage me to continue making the bot
 
