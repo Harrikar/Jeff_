@@ -1,6 +1,6 @@
 import disnake
 from disnake.ext import commands
-import Utils.Utils as Utils
+import Utils as Utils
 
 class ServerCommand(commands.Cog):
     def __init__(self, bot):
@@ -19,10 +19,10 @@ class ServerCommand(commands.Cog):
         commandString = f"/server server: {server}"
         await inter.response.defer()
         try:
-            serverLookup = Utils.Lookup.lookup(server)
-            allResidentsLookup = Utils.Lookup.lookup(server, endpoint="residents")
-            allTownsLookup = Utils.Lookup.lookup(server, endpoint="towns")
-            allNationsLookup = Utils.Lookup.lookup(server, endpoint="nations")
+            serverLookup = await Utils.Lookup.lookup(server)
+            allResidentsLookup = await Utils.Lookup.lookup(server, endpoint="residents")
+            allTownsLookup = await Utils.Lookup.lookup(server, endpoint="towns")
+            allNationsLookup = await Utils.Lookup.lookup(server, endpoint="nations")
 
         except:
             embed = Utils.Embeds.error_embed(
