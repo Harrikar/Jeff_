@@ -2,66 +2,70 @@ import disnake
 from disnake.ext import commands
 import sys
 import os
-import Utils
 import datetime
-from Utils import Embeds
+import Utils as Utils
+from Utils import *
+import subprocess
+
+
 class devcommand(commands.Cog):
+
+
     def __init__(self, bot):
         self.bot = bot
         self.time = datetime.datetime.now()
 
-    @commands.slash_command(name="restart command")
-    async def restart(self, ctx,inter: disnake.ApplicationCommandInteraction):
+    @commands.slash_command()
+    async def restart(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
 
-        guild = ctx.guild
-        member = ctx.author
+        guild = inter.guild
+        member = inter.author
 
         role_id = 1131896754070093954
         role = disnake.utils.get(guild.roles, id=role_id)
 
         if role in member.roles:
 
-            embed = Embeds.embed_builder(
+            embed = Utils.Embeds.embed_builder(
                 'Restarting',
                 author=inter.author
             )
             embed.add_field(name='Program was run at',value=self.time,inline=True)
-            embed.color(inter.author.accent_color)
             await inter.edit_original_response(embed=embed)
 
             python = sys.executable
-            os.execl(python, python, *sys.argv)
+            subprocess.Popen([python] + sys.argv)
 
 
         else:
-            await ctx.send(f"{member.display_name}, you do not have the required role.")
+            await inter.send(f"{member.display_name}, you do not have the required role.")
 
 
 
-    @commands.slash_command(name='stop command')
-    async def stop(self, ctx, inter: disnake.ApplicationCommandInteraction):
+    @commands.slash_command()
+    async def stop(self, inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
 
-        guild = ctx.guild
-        member = ctx.author
+        guild = inter.guild
+        member = inter.author
 
         role_id = 1131896754070093954
         role = disnake.utils.get(guild.roles, id=role_id)
 
         if role in member.roles:
 
-            embed = Embeds.embed_builder(
+            embed = Utils.Embeds.embed_builder(
                 'Stopping',
                 author=inter.author
             )
             embed.add_field(name='Program was run at', value=self.time, inline=True)
-            embed.color(inter.author.accent_color)
             await inter.edit_original_response(embed=embed)
             sys.exit()
 
         else:
-            await ctx.send(f"{member.display_name}, you do not have the required role.")
+            await inter.send(f"{member.display_name}, you do not have the required role.")
 
 def setup(bot):
+
     bot.add_cog(devcommand(bot))
