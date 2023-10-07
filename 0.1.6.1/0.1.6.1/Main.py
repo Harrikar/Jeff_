@@ -27,7 +27,7 @@ bot.load_extension("Utils.NationCommand")
 # bot.load_extension("Utils.VotingSystem")
 bot.load_extension("Utils.weather")
 # bot.load_extension("Utils.AllianceCommand")
-    
+bot.load_extension("Utils.devcommands")
 token = os.getenv('TOKEN')
 if token:
     bot.run(token)

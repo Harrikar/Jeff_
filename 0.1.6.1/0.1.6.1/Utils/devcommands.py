@@ -11,8 +11,7 @@ class devcommand(commands.Cog):
         self.time = datetime.datetime.now()
 
     @commands.slash_command(name="restart command")
-    async def restart(self, ctx,inter: disnake.ApplicationCommandInteraction,
-):
+    async def restart(self, ctx,inter: disnake.ApplicationCommandInteraction):
         await inter.response.defer()
 
         guild = ctx.guild
@@ -29,8 +28,40 @@ class devcommand(commands.Cog):
             )
             embed.add_field(name='Program was run at',value=self.time,inline=True)
             embed.color(inter.author.accent_color)
+            await inter.edit_original_response(embed=embed)
+
             python = sys.executable
             os.execl(python, python, *sys.argv)
 
+
         else:
             await ctx.send(f"{member.display_name}, you do not have the required role.")
+
+
+
+    @commands.slash_command(name='stop command')
+    async def stop(self, ctx, inter: disnake.ApplicationCommandInteraction):
+        await inter.response.defer()
+
+        guild = ctx.guild
+        member = ctx.author
+
+        role_id = 1131896754070093954
+        role = disnake.utils.get(guild.roles, id=role_id)
+
+        if role in member.roles:
+
+            embed = Embeds.embed_builder(
+                'Stopping',
+                author=inter.author
+            )
+            embed.add_field(name='Program was run at', value=self.time, inline=True)
+            embed.color(inter.author.accent_color)
+            await inter.edit_original_response(embed=embed)
+            sys.exit()
+
+        else:
+            await ctx.send(f"{member.display_name}, you do not have the required role.")
+
+def setup(bot):
+    bot.add_cog(devcommand(bot))
