@@ -28,8 +28,9 @@ bot.load_extension("Utils.NationCommand")
 bot.load_extension("Utils.weather")
 # bot.load_extension("Utils.AllianceCommand")
 bot.load_extension("Utils.devcommands")
-token = os.getenv('TOKEN')
-if token:
-    bot.run(token)
-else:
-    print("Failed to retrieve bot token.")
+
+try:
+    token = os.getenv('TOKE')
+    bot.run(str(token))
+except Exception as e:
+    print("Failed to retrieve bot token.",e)

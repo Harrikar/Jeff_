@@ -61,7 +61,7 @@ class devcommand(commands.Cog):
             )
             embed.add_field(name='Program was run at', value=self.time, inline=True)
             await inter.edit_original_response(embed=embed)
-            sys.exit()
+            exit(code=2)
 
         else:
             await inter.send(f"{member.display_name}, you do not have the required role.")
