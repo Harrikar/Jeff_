@@ -126,7 +126,7 @@ class Embeds():
             )
         else:
             embed.set_footer(
-                icon_url="https://cdn.discordapp.com/avatars/1082118155528314892/7a83e01cbb11d4115d6cd1ae3f178eb0.webp",
+                icon_url="https://cdn.discordapp.com/attachments/1102246811479060591/1130793081432707092/Screenshot_2023-07-18_at_4.27.56_AM.png",
                 text="Jeff_"
             )
 
