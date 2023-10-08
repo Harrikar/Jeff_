@@ -21,7 +21,7 @@ bot.load_extension("Utils.ServerCommand")
 bot.load_extension("Utils.ResCommand")
 bot.load_extension("Utils.TownCommand")
 bot.load_extension("Utils.NationCommand")
-# bot.load_extension("Utils.ModerationCommands")
+bot.load_extension("Utils.ModerationCommands")
 # bot.load_extension("Utils.RoleManaging")
 # bot.load_extension("Utils.LevelingSystem")
 # bot.load_extension("Utils.VotingSystem")
@@ -30,7 +30,7 @@ bot.load_extension("Utils.weather")
 bot.load_extension("Utils.devcommands")
 
 try:
-    token = os.getenv('TOKE')
+    token = os.getenv('TOKEN')
     bot.run(str(token))
 except Exception as e:
     print("Failed to retrieve bot token.",e)
