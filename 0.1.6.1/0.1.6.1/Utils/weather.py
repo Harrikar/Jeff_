@@ -16,7 +16,7 @@ class Weather(commands.Cog):
             await inter.response.send_message("Invalid unit system. Please use 'metric' or 'imperial'.")
             return
 
-        api_key = "7ef56e400a62114e2f5ec8ccd15b1ddb"  # Replace this with your OpenWeatherMap API key
+        api_key = ""  # Replace this with your OpenWeatherMap API key
         base_url = "http://api.openweathermap.org/data/2.5/weather?"
 
         params = {
