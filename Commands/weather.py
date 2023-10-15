@@ -37,7 +37,7 @@ class Weather(commands.Cog):
 
             unit_symbol = "°C" if unit == "metric" else "°F"
 
-            weather_embed = disnake.Embed(title=f"Weather in {location}", color=0x00FF00)
+            weather_embed = Utils.Embeds.embed_builder(title=f'Weather in {location}')
             weather_embed.add_field(name="Description", value=weather_description, inline=False)
             weather_embed.add_field(name="Temperature", value=f"{temperature} {unit_symbol}", inline=True)
             weather_embed.add_field(name="Humidity", value=f"{humidity}%", inline=True)
@@ -49,4 +49,3 @@ class Weather(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Weather(bot))
-

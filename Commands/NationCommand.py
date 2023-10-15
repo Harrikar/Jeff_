@@ -1,9 +1,8 @@
 import random
 import disnake
 from disnake.ext import commands
-import Utils as Utils
 from Utils import *
-from disnake.errors import InteractionTimedOut
+
 
 class NationCommand(commands.Cog):
     def __init__(self, bot):
@@ -295,7 +294,8 @@ class NationCommand(commands.Cog):
             embed = Utils.Embeds.embed_builder(
                 title=f"`{nationsLookup['strings']['nation']}'s Unallied Nations`",
                 footer=commandString,
-                author=inter.author
+                author=inter.author,
+                inter=inter.author.accent_colour
             )
 
             allyList = nationsLookup["allies"]

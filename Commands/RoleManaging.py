@@ -1,6 +1,5 @@
 import disnake
 from disnake.ext import commands
-import Utils as Utils
 from Utils import *
 
 class RoleManaging(commands.Cog):

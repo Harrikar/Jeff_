@@ -91,8 +91,8 @@ class Lookup:
 class Embeds():
 
      @staticmethod
-     def embed_builder(title, description=None, author=None, footer='Maintained by charis_k', thumbnail=None, maintain_bot=False,
-                        your_name='Charis'):
+     def embed_builder(title,description=None, author=None, footer='Maintained by charis_k', thumbnail=None, maintain_bot=False,
+                        your_name=None):
         embed = disnake.Embed(
             title=title,
             description=description,
@@ -139,7 +139,7 @@ class Embeds():
         return embed
 
      @staticmethod
-     def error_embed(value, type=None, footer=None):
+     def error_embed(value,type=None, footer=None,):
         if type != "userError":
             traceback.print_exc()
         embed = Embeds.embed_builder(title="`Error`", footer=footer)
