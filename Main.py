@@ -8,7 +8,8 @@ bot: InteractionBot = commands.InteractionBot()
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=disnake.Game(name="play.earthmc.net"))
+    await bot.change_presence(activity=disnake.Game(name=f"operating in {len(bot.guilds)}"))
+
     print(f"Logged in as {bot.user}")
     print(f"Operating in {len(bot.guilds)} guild/s")
     print(f'Presence is playing : play.earthmc.net')
