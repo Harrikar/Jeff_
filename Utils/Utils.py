@@ -4,7 +4,6 @@ import aiohttp
 import traceback
 from cachetools import TTLCache
 
-
 class CommandTools:
     def list_to_string(*args):
         return "\n".join(str(item) for item in args)
@@ -64,10 +63,12 @@ class CommandTools:
 
 
 class Lookup:
-    cache = TTLCache(maxsize=300, ttl=100)
+    cache = TTLCache(maxsize=400, ttl=150)
+
     try:
         if len(cache) == cache.maxsize:
             cache.clear()
+
     except Exception as e:
         raise e
 
@@ -79,8 +80,11 @@ class Lookup:
                 api_url = f"https://api.earthmc.net/v1/{server}/"
             elif name is None:
                 api_url = f"https://api.earthmc.net/v1/{server}/{endpoint}"
+            elif endpoint == 'alliance':
+                api_url = f'https://emctoolkit.vercel.app/api/aurora/alliances/{name}'
             else:
                 api_url = f"https://api.earthmc.net/v1/{server}/{endpoint}/{name}"
+
 
             # Check if the data is already cached
             if (server, endpoint, name) in cls.cache:
