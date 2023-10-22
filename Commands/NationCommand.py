@@ -8,6 +8,7 @@ from Utils.Utils import *
 class NationCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.footer = 'made by charis_k'
 
     @commands.slash_command(description="Nation-related commands.")
     async def nation(self, inter: disnake.ApplicationCommandInteraction):
@@ -36,7 +37,7 @@ class NationCommand(commands.Cog):
             embed = Utils.Embeds.embed_builder(
                 title=f"`{nationsLookup['strings']['nation']}`",
                 description=nationsLookup["strings"]["board"],
-                footer=commandString,
+                footer=self.footer,
                 author=inter.author
             )
 
@@ -73,7 +74,7 @@ class NationCommand(commands.Cog):
         except Exception as e:
             embed = Utils.Embeds.error_embed(
                 value=f'Error is {e}',
-                footer=commandString
+                footer=self.footer
             )
 
             await inter.edit_original_response(embed=embed)
@@ -95,7 +96,7 @@ class NationCommand(commands.Cog):
 
             embed = Utils.Embeds.embed_builder(
                 title=f"`{nationsLookup['strings']['nation']}'s Residents`",
-                footer=commandString,
+                footer=self.footer,
                 author=inter.author
             )
 
@@ -108,10 +109,11 @@ class NationCommand(commands.Cog):
         except Exception as e:
             embed = Utils.Embeds.error_embed(
                 value=f'Error is {e}',
-                footer=commandString
+                footer=self.footer,
+
             )
 
-            await inter.edit_original_response(embed=embed, ephemeral=True)
+            await inter.edit_original_response(embed=embed)
 
     @nation.sub_command(description="Retrieve and display the list of ranked residents in a nation.")
     async def ranklist(
@@ -130,7 +132,7 @@ class NationCommand(commands.Cog):
 
             embed = Utils.Embeds.embed_builder(
                 title=f"`{nationsLookup['strings']['nation']}'s Ranked Residents`",
-                footer=commandString,
+                footer=self.footer,
                 author=inter.author
             )
 
@@ -148,7 +150,7 @@ class NationCommand(commands.Cog):
         except Exception as e:
             embed = Utils.Embeds.error_embed(
                 value=f'Error is {e}',
-                footer=commandString
+                footer=self.footer
             )
 
             await inter.edit_original_response(embed=embed, ephemeral=True)
@@ -171,7 +173,7 @@ class NationCommand(commands.Cog):
 
             embed = Utils.Embeds.embed_builder(
                 title=f"`{nationsLookup['strings']['nation']}'s Allies`",
-                footer=commandString,
+                footer=self.footer,
                 author=inter.author
             )
 
@@ -192,7 +194,7 @@ class NationCommand(commands.Cog):
         except Exception as e:
             embed = Utils.Embeds.error_embed(
                 value=f'Error is {e}',
-                footer=commandString
+                footer=self.footer
             )
 
             await inter.edit_original_response(embed=embed, ephemeral=True)
@@ -214,7 +216,7 @@ class NationCommand(commands.Cog):
 
             embed = Utils.Embeds.embed_builder(
                 title=f"`{nationsLookup['strings']['nation']}'s Enemies`",
-                footer=commandString,
+                footer=self.footer,
                 author=inter.author
             )
 
@@ -235,7 +237,7 @@ class NationCommand(commands.Cog):
         except Exception as e:
             embed = Utils.Embeds.error_embed(
                 value=f'Error is {e}',
-                footer=commandString
+                footer=self.footer
             )
 
             await inter.edit_original_response(embed=embed, ephemeral=True)
@@ -257,7 +259,7 @@ class NationCommand(commands.Cog):
 
             embed = Utils.Embeds.embed_builder(
                 title=f"`{nationsLookup['strings']['nation']}'s Towns`",
-                footer=commandString,
+                footer=self.footer,
                 author=inter.author
             )
 
@@ -270,7 +272,7 @@ class NationCommand(commands.Cog):
         except Exception as e:
             embed = Utils.Embeds.error_embed(
                 value=f'Error is {e}',
-                footer=commandString
+                footer=self.footer
             )
 
             await inter.edit_original_response(embed=embed, ephemeral=True)
@@ -293,7 +295,7 @@ class NationCommand(commands.Cog):
 
             embed = Utils.Embeds.embed_builder(
                 title=f"`{nationsLookup['strings']['nation']}'s Unallied Nations`",
-                footer=commandString,
+                footer=self.footer,
                 author=inter.author,
             )
 
@@ -322,7 +324,7 @@ class NationCommand(commands.Cog):
             embed = Utils.Embeds.error_embed(
                 value=f'Error is {e}',
 
-                footer=commandString
+                footer=self.footer
             )
 
             await inter.edit_original_response(embed=embed, ephemeral=True)
