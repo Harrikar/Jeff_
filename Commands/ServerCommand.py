@@ -5,6 +5,8 @@ import Utils.Utils as Utils
 class ServerCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.footer = 'made by charis_k'
+
 
     @commands.slash_command(description="Provides info about a server")
     async def server(
@@ -27,7 +29,7 @@ class ServerCommand(commands.Cog):
         except Exception as e:
             embed = Utils.Embeds.error_embed(
                 value=f'Error is {e}',
-                footer=commandString
+                footer=self.footer
             )
 
             await inter.send(embed=embed, ephemeral=True)
@@ -38,7 +40,7 @@ class ServerCommand(commands.Cog):
 
             embed = Utils.Embeds.embed_builder(
                 title=f"`{server.capitalize()}`",
-                footer=commandString,
+                footer=self.footer,
                 author=inter.author
             )
 
@@ -67,7 +69,7 @@ class ServerCommand(commands.Cog):
         except Exception as e:
             embed = Utils.Embeds.error_embed(
                 value=f'Error is {e}',
-                footer=commandString
+                footer=self.footer
             )
 
             await inter.send(embed=embed, ephemeral=True)
