@@ -7,6 +7,8 @@ import os
 class Weather(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.footer = 'made by charis_k'
+
 
     @commands.slash_command(name="weather", help="Get the current weather for a location.",description="Get the current weather for a location")
     async def weather(self, inter: disnake.ApplicationCommandInteraction, location: str, unit: str = "metric"):
@@ -40,7 +42,11 @@ class Weather(commands.Cog):
 
             unit_symbol = "°C" if unit == "metric" else "°F"
 
-            weather_embed = Utils.Embeds.embed_builder(title=f'Weather in {location}')
+            weather_embed = Utils.Embeds.embed_builder(
+                title=f'Weather in {location}',
+                footer=self.footer,
+                author=inter.author
+            )
             weather_embed.add_field(name="Description", value=weather_description, inline=False)
             weather_embed.add_field(name="Temperature", value=f"{temperature} {unit_symbol}", inline=True)
             weather_embed.add_field(name="Humidity", value=f"{humidity}%", inline=True)
