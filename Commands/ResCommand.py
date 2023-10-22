@@ -7,6 +7,7 @@ from Utils.Utils import *
 class ResCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.footer = 'made by charis_k'
 
     @commands.slash_command()
     async def res(
@@ -33,7 +34,7 @@ class ResCommand(commands.Cog):
             embed = Utils.Embeds.error_embed(
                 value=f'Error is {e}',
                 type="userError",
-                footer=commandString,
+                footer=self.footer,
             )
             await inter.send(embed=embed, ephemeral=True)
             return
@@ -91,7 +92,8 @@ class ResCommand(commands.Cog):
         except Exception as e:
             embed = Utils.Embeds.error_embed(
                 value=f'Error is {e}',
-                footer=commandString)
+                footer=self.footer
+            )
             await inter.send(embed=embed, ephemeral=True)
 
 
@@ -110,7 +112,7 @@ class ResCommand(commands.Cog):
             embed = Utils.Embeds.error_embed(
                 value=f'Error is {e}',
                 type="userError",
-                footer=commandString,
+                footer=self.footer,
             )
             await inter.send(embed=embed, ephemeral=True)
             return
@@ -118,7 +120,7 @@ class ResCommand(commands.Cog):
         try:
             embed = Utils.Embeds.embed_builder(
                 title=f"`{residentsLookup['strings']['username']}'s Friends",
-                footer=commandString,
+                footer=self.footer,
                 author=inter.author,
             )
 
@@ -133,7 +135,8 @@ class ResCommand(commands.Cog):
         except Exception as e:
             embed = Utils.Embeds.error_embed(
                 value=f'Error is {e}',
-                footer=commandString)
+                footer=self.footer
+            )
             await inter.send(embed=embed, ephemeral=True)
 
 
