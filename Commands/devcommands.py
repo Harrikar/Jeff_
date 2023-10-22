@@ -57,7 +57,6 @@ class devcommand(commands.Cog):
 
         elif inter.guild_id == 1038964213961457674:
             role_id = 1135853311313068082
-
         else:
             role_id = 1131896754070093954
 
@@ -72,7 +71,6 @@ class devcommand(commands.Cog):
             exit(code=1)
         else:
             await inter.send(f"{member.display_name}, you do not have the required role.")
-            await inter.send('blud aint gonna happen soon',epheral=True)
 
     @commands.slash_command(description='The bots ping')
     async def ping(self, inter: disnake.ApplicationCommandInteraction):
